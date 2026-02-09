@@ -558,7 +558,7 @@ export default function Preview() {
                   {(frameworkRouteFiles[implementationFramework] || []).map((item) => (
                     <li key={item.file} className="flex flex-wrap gap-2">
                       <span className="text-zinc-400">{item.route}</span>
-                      <span className="text-zinc-500">-></span>
+                      <span className="text-zinc-500">{'->'}</span>
                       <code className="text-zinc-100">{item.file}</code>
                     </li>
                   ))}
