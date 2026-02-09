@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Lock, Check, Loader2, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { getUserTier } from '@/lib/tierUtils';
 import { CompetitiveRadarChart } from './competitive/CompetitiveRadarChart';
+
+// Tier utilities - inline to avoid import issues
+const getUserTier = () => {
+  if (typeof window === 'undefined') return 'free';
+  return localStorage.getItem('annexa_tier') || 'free';
+};
+
+const upgradeToPremium = (sessionId) => {
+  localStorage.setItem('annexa_tier', 'premium');
+  if (sessionId) {
+    localStorage.setItem('annexa_stripe_session', sessionId);
+  }
+};
 
 export default function CompetitiveIntelligence({
   formData,
@@ -15,6 +27,7 @@ export default function CompetitiveIntelligence({
   onSkip,
   onUpgrade,
   crawledWebsiteData, // New: data from URLCapture crawl
+  highlightAnalyze = false, // New: highlight the analyze button after returning from checkout
 }) {
   const [competitorUrl, setCompetitorUrl] = useState('');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -25,10 +38,20 @@ export default function CompetitiveIntelligence({
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [checkingOut, setCheckingOut] = useState(false);
 
   // Use persistent tier from localStorage, fallback to prop
   const tier = getUserTier() || tierProp || 'free';
   const isPremium = tier === 'premium';
+
+  // Restore competitor URL from URL params (after returning from Stripe)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const savedCompetitorUrl = urlParams.get('competitorUrl');
+    if (savedCompetitorUrl) {
+      setCompetitorUrl(decodeURIComponent(savedCompetitorUrl));
+    }
+  }, []);
 
   const handleAnalyzeClick = () => {
     if (!isPremium) {
@@ -396,7 +419,9 @@ export default function CompetitiveIntelligence({
             onClick={handleAnalyzeClick}
             disabled={!competitorUrl.trim()}
             variant="outline"
-            className="border-[#C24516] text-[#C24516] hover:bg-[#C24516] hover:text-white bg-transparent whitespace-nowrap"
+            className={`border-[#C24516] text-[#C24516] hover:bg-[#C24516] hover:text-white bg-transparent whitespace-nowrap ${
+              highlightAnalyze && isPremium ? 'ring-2 ring-[#C24516] ring-offset-2 ring-offset-zinc-900 animate-pulse' : ''
+            }`}
           >
             Analyze {!isPremium && <Lock className="w-3 h-3 ml-1" />}
           </Button>
@@ -417,10 +442,42 @@ export default function CompetitiveIntelligence({
             </p>
             <div className="flex gap-3">
               <Button
-                onClick={onUpgrade}
+                onClick={async () => {
+                  // Check if running in iframe
+                  if (window.self !== window.top) {
+                    alert('Checkout works only from the published app. Please open this page directly.');
+                    return;
+                  }
+                  
+                  setCheckingOut(true);
+                  try {
+                    const response = await base44.functions.invoke('createCheckoutSession', {
+                      returnUrl: window.location.origin,
+                      competitorUrl: competitorUrl,
+                    });
+                    
+                    if (response.data.success && response.data.checkoutUrl) {
+                      window.location.href = response.data.checkoutUrl;
+                    } else {
+                      throw new Error(response.data.error || 'Failed to create checkout');
+                    }
+                  } catch (err) {
+                    console.error('Checkout error:', err);
+                    setError('Failed to start checkout. Please try again.');
+                    setCheckingOut(false);
+                  }
+                }}
+                disabled={checkingOut}
                 className="bg-[#C24516] hover:bg-[#a33912] text-white"
               >
-                Upgrade to Premium
+                {checkingOut ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Upgrade to Premium'
+                )}
               </Button>
               <Button
                 onClick={onSkip}
@@ -505,13 +562,42 @@ export default function CompetitiveIntelligence({
 
             <div className="flex gap-3 pt-2">
               <Button
-                onClick={() => {
-                  setShowUpgradeModal(false);
-                  onUpgrade();
+                onClick={async () => {
+                  // Check if running in iframe
+                  if (window.self !== window.top) {
+                    alert('Checkout works only from the published app. Please open this page directly.');
+                    return;
+                  }
+                  
+                  setCheckingOut(true);
+                  try {
+                    const response = await base44.functions.invoke('createCheckoutSession', {
+                      returnUrl: window.location.origin,
+                      competitorUrl: competitorUrl,
+                    });
+                    
+                    if (response.data.success && response.data.checkoutUrl) {
+                      window.location.href = response.data.checkoutUrl;
+                    } else {
+                      throw new Error(response.data.error || 'Failed to create checkout');
+                    }
+                  } catch (err) {
+                    console.error('Checkout error:', err);
+                    setError('Failed to start checkout. Please try again.');
+                    setCheckingOut(false);
+                  }
                 }}
+                disabled={checkingOut}
                 className="flex-1 bg-[#C24516] hover:bg-[#a33912] text-white"
               >
-                Upgrade to Premium - $29
+                {checkingOut ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading checkout...
+                  </>
+                ) : (
+                  'Upgrade to Premium - $29'
+                )}
               </Button>
               <Button
                 onClick={() => setShowUpgradeModal(false)}
