@@ -51,9 +51,9 @@ import AnnexaCookies from './pages/AnnexaCookies';
 import AnnexaPrivacy from './pages/AnnexaPrivacy';
 import AnnexaTerms from './pages/AnnexaTerms';
 import DataRequest from './pages/DataRequest';
-import Preview from './pages/Preview';
 import Form from './pages/Form';
 import Home from './pages/Home';
+import Preview from './pages/Preview';
 import URLCapture from './pages/URLCapture';
 import __Layout from './Layout.jsx';
 
@@ -63,9 +63,9 @@ export const PAGES = {
     "AnnexaPrivacy": AnnexaPrivacy,
     "AnnexaTerms": AnnexaTerms,
     "DataRequest": DataRequest,
-    "Preview": Preview,
     "Form": Form,
     "Home": Home,
+    "Preview": Preview,
     "URLCapture": URLCapture,
 }
 

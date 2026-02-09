@@ -20,32 +20,42 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#09090B] text-white">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&family=Poppins:wght@400;500;600&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&family=Poppins:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+          --app-accent: #C24516;
+        }
+
         body {
           font-family: 'Poppins', sans-serif;
         }
-        
+
         h1, h2, h3, h4, h5, h6 {
           font-family: 'Caudex', serif;
+        }
+
+        .mono-accent {
+          font-family: 'JetBrains Mono', monospace;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
         }
       `}</style>
       
       <header className="border-b border-[rgba(250,247,242,0.12)]">
         <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-[40px] font-bold text-[#faf7f2] tracking-[0.08em]">
+          <div className="flex flex-col">
+            <h1 className="text-[40px] font-bold text-[#faf7f2] tracking-[0.08em] leading-none">
               ANNEXA
-              <span className="text-[#C24516]">.</span>
+              <span className="text-[var(--app-accent)] text-[48px] leading-none align-baseline">.</span>
             </h1>
-            <p className="text-lg text-[rgba(250,247,242,0.7)]">Legal boilerplate for builders</p>
-            <p className="text-[13px] text-[rgba(250,247,242,0.5)] mt-1">
+            <p className="text-lg text-[rgba(250,247,242,0.7)] mt-1">Legal boilerplate for builders</p>
+            <p className="mono-accent text-[11px] text-[rgba(250,247,242,0.4)] mt-3">
               Free tool by{' '}
               <a 
                 href="https://vox-animus.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-[rgba(250,247,242,0.7)] hover:text-[#C24516] hover:underline transition-colors duration-150"
+                className="text-[rgba(250,247,242,0.5)] hover:text-[var(--app-accent)] transition-colors duration-150"
               >
                 Vox Animus
               </a>
