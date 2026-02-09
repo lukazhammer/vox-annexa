@@ -769,7 +769,7 @@ export default function Form() {
       <div className="flex flex-col lg:grid lg:grid-cols-11 gap-6 sm:gap-8">
         {/* LEFT PANE - Form */}
         <div className="lg:col-span-5 order-1">
-          <div className="lg:sticky lg:top-6 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 sm:p-6 lg:max-w-[500px] max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#C24516] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:#C24516_transparent]">
+          <div className="lg:sticky lg:top-6 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 sm:p-6 lg:max-w-[500px] max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--app-accent)] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:var(--app-accent)_transparent]">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
               <h2 className="text-xl sm:text-2xl font-bold">Tell us about your product</h2>
               <div className="flex items-center gap-2">
@@ -789,8 +789,8 @@ export default function Form() {
                   </button>
                   {showKeyboardHelp && (
                     <div className="absolute right-0 top-6 bg-[#09090B] border border-zinc-800 rounded-lg p-3 w-48 text-xs text-zinc-300 space-y-1.5 z-10 shadow-lg">
-                      <div><span className="text-[#C24516] font-semibold">⌘ + S</span> Save draft</div>
-                      <div><span className="text-[#C24516] font-semibold">⌘ + ↵</span> Next section</div>
+                      <div><span className="text-[var(--app-accent)] font-semibold">⌘ + S</span> Save draft</div>
+                      <div><span className="text-[var(--app-accent)] font-semibold">⌘ + ↵</span> Next section</div>
                       <div className="text-zinc-500 text-[11px] pt-1.5 border-t border-zinc-800">Tab through fields</div>
                     </div>
                   )}
@@ -802,7 +802,7 @@ export default function Form() {
             </p>
 
             {autofilledFields.size > 0 && (
-              <div className="mb-4 flex items-center gap-2 text-xs text-[#C24516] bg-[#C24516]/5 border border-[#C24516]/20 rounded px-3 py-2">
+              <div className="mb-4 flex items-center gap-2 text-xs text-[var(--app-accent)] bg-[var(--app-accent)]/5 border border-[var(--app-accent)]/20 rounded px-3 py-2">
                 <Check className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>{autofilledFields.size} field{autofilledFields.size !== 1 ? 's' : ''} pre-filled from your website</span>
               </div>
@@ -811,7 +811,7 @@ export default function Form() {
             {scanResults?.found && scanResults.found.length > 0 && (
               <details className="mb-6 group">
                 <summary className="cursor-pointer text-sm text-[rgba(250,247,242,0.7)] hover:text-[#faf7f2] transition-colors list-none flex items-center gap-2">
-                  <span className="text-[#C24516]">▼</span>
+                  <span className="text-[var(--app-accent)]">▼</span>
                   <span>We found these existing files ({scanResults.found.length})</span>
                 </summary>
                 <div className="mt-3 pl-6 flex flex-wrap gap-2">
@@ -837,7 +837,7 @@ export default function Form() {
                   <Label className="text-white mb-2 block text-base sm:text-sm">
                     What should we call your product? *
                     {autofilledFields.has('company_name') && (
-                      <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                      <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
                     )}
                   </Label>
                   <Input
@@ -849,7 +849,7 @@ export default function Form() {
                       setHighlightedField(null);
                     }}
                     className={`bg-zinc-900 border-zinc-800 text-white text-base h-12 sm:h-10 ${errors.company_name && touched.company_name ? 'border-red-500' : ''
-                      } ${autofilledFields.has('company_name') ? 'border-[#C24516]/30' : ''}`}
+                      } ${autofilledFields.has('company_name') ? 'border-[var(--app-accent)]/30' : ''}`}
                     placeholder="TaskFlow"
                   />
                   {errors.company_name && touched.company_name && (
@@ -861,7 +861,7 @@ export default function Form() {
                   <Label className="text-white mb-2 block text-base sm:text-sm">
                     Describe your product in one sentence *
                     {autofilledFields.has('product_description') && (
-                      <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                      <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
                     )}
                   </Label>
                   <Textarea
@@ -900,7 +900,7 @@ export default function Form() {
                     }}
                     disabled={!isStep1Complete()}
                     className={`w-full h-12 text-base transition-all ${isStep1Complete()
-                        ? 'bg-[#C24516] hover:bg-[#a33912] text-white cursor-pointer'
+                        ? 'bg-[var(--app-accent)] hover:brightness-90 text-white cursor-pointer'
                         : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
                       }`}
                   >
@@ -955,7 +955,7 @@ export default function Form() {
                     <Label className="text-white mb-2 block text-base sm:text-sm">
                       Where is your company based? *
                       {autofilledFields.has('country') && (
-                        <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                        <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
                       )}
                     </Label>
                     <Input
@@ -971,7 +971,7 @@ export default function Form() {
                     )}
                     {formData.jurisdiction && (
                       <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded px-3 py-2">
-                        <Info className="w-3.5 h-3.5 text-[#C24516] flex-shrink-0" />
+                        <Info className="w-3.5 h-3.5 text-[var(--app-accent)] flex-shrink-0" />
                         <span>
                           {formData.jurisdiction === 'eu' && 'GDPR compliance applies'}
                           {formData.jurisdiction === 'us' && 'CCPA compliance applies'}
@@ -1001,7 +1001,7 @@ export default function Form() {
                     <Button
                       type="button"
                       onClick={() => setCurrentStep(3)}
-                      className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12 text-base hidden md:flex"
+                      className="w-full bg-[var(--app-accent)] hover:brightness-90 text-white h-12 text-base hidden md:flex"
                     >
                       Continue to Contact <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -1036,7 +1036,7 @@ export default function Form() {
                     <Label className="text-white mb-2 block text-base sm:text-sm">
                       Where can users reach you? *
                       {autofilledFields.has('contact_email') && (
-                        <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                        <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
                       )}
                     </Label>
                     <Input
@@ -1056,9 +1056,9 @@ export default function Form() {
                   {/* Premium Fields Section */}
                   {isPremium && (
                     <div className="mt-6 pt-6 border-t border-zinc-700 space-y-4">
-                      <div className="bg-[#C24516]/10 border border-[#C24516]/30 rounded-lg p-4 mb-4">
+                      <div className="bg-[var(--app-accent)]/10 border border-[var(--app-accent)]/30 rounded-lg p-4 mb-4">
                         <p className="text-sm text-zinc-300">
-                          <span className="text-[#C24516] font-semibold">Premium:</span> Answer these to get highly customized documents and social bios
+                          <span className="text-[var(--app-accent)] font-semibold">Premium:</span> Answer these to get highly customized documents and social bios
                         </p>
                       </div>
 
@@ -1116,7 +1116,7 @@ export default function Form() {
                               <RadioGroupItem value="professional" id="tone-professional" />
                               <Label
                                 htmlFor="tone-professional"
-                                className={`font-normal cursor-pointer ${formData.tone_preference === 'professional' ? 'text-[#C24516]' : 'text-zinc-300'}`}
+                                className={`font-normal cursor-pointer ${formData.tone_preference === 'professional' ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
                               >
                                 Professional and formal
                               </Label>
@@ -1125,7 +1125,7 @@ export default function Form() {
                               <RadioGroupItem value="conversational" id="tone-conversational" />
                               <Label
                                 htmlFor="tone-conversational"
-                                className={`font-normal cursor-pointer ${formData.tone_preference === 'conversational' ? 'text-[#C24516]' : 'text-zinc-300'}`}
+                                className={`font-normal cursor-pointer ${formData.tone_preference === 'conversational' ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
                               >
                                 Conversational and friendly
                               </Label>
@@ -1134,7 +1134,7 @@ export default function Form() {
                               <RadioGroupItem value="technical" id="tone-technical" />
                               <Label
                                 htmlFor="tone-technical"
-                                className={`font-normal cursor-pointer ${formData.tone_preference === 'technical' ? 'text-[#C24516]' : 'text-zinc-300'}`}
+                                className={`font-normal cursor-pointer ${formData.tone_preference === 'technical' ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
                               >
                                 Technical and precise
                               </Label>
@@ -1160,7 +1160,7 @@ export default function Form() {
                             />
                             <Label
                               htmlFor="strategy-community"
-                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('community') ? 'text-[#C24516]' : 'text-zinc-300'}`}
+                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('community') ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
                             >
                               Building community
                             </Label>
@@ -1179,7 +1179,7 @@ export default function Form() {
                             />
                             <Label
                               htmlFor="strategy-launches"
-                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('launches') ? 'text-[#C24516]' : 'text-zinc-300'}`}
+                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('launches') ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
                             >
                               Announcing launches
                             </Label>
@@ -1198,7 +1198,7 @@ export default function Form() {
                             />
                             <Label
                               htmlFor="strategy-updates"
-                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('updates') ? 'text-[#C24516]' : 'text-zinc-300'}`}
+                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('updates') ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
                             >
                               Sharing updates
                             </Label>
@@ -1275,7 +1275,7 @@ export default function Form() {
           <div className="flex items-center gap-2 text-xs text-zinc-400">
             <span>Step {currentStep} of 3</span>
             <span>•</span>
-            <span className="text-[#C24516]">
+            <span className="text-[var(--app-accent)]">
               {currentStep === 1 && `${progress.foundation.completed}/${progress.foundation.fields.length} complete`}
               {currentStep === 2 && `${progress.legalBasics.completed}/${progress.legalBasics.fields.length} complete`}
               {currentStep === 3 && `${progress.contact.completed}/${progress.contact.fields.length} complete`}
@@ -1284,7 +1284,7 @@ export default function Form() {
           <Button
             onClick={nextAction}
             disabled={generating}
-            className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-14 text-base font-semibold"
+            className="w-full bg-[var(--app-accent)] hover:brightness-90 text-white h-14 text-base font-semibold"
           >
             {generating ? (
               <div className="flex flex-col items-center w-full">
@@ -1340,13 +1340,13 @@ export default function Form() {
             <div className="flex gap-3 justify-end">
               <Button
                 onClick={() => setShowDeleteDraftModal(false)}
-                className="bg-white text-[#09090B] hover:bg-[#faf7f2] hover:border-[#C24516]"
+                className="bg-white text-[#09090B] hover:bg-[#faf7f2] hover:border-[var(--app-accent)]"
               >
                 Cancel
               </Button>
               <Button
                 onClick={confirmDeleteDraft}
-                className="bg-[#C24516] hover:bg-[#a33912] text-white"
+                className="bg-[var(--app-accent)] hover:brightness-90 text-white"
               >
                 Delete draft
               </Button>
