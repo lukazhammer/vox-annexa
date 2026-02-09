@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
 
 Thanks for upgrading to Annexa EDGE!
 
-Receipt: $29.00${receiptLink ? ` - Download receipt: ${receiptLink}` : ''}
+Receipt: $19.00${receiptLink ? ` - Download receipt: ${receiptLink}` : ''}
 
 Your EDGE package is ready:
 - All documents (no watermark)

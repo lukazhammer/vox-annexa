@@ -682,7 +682,7 @@ export default function CompetitiveIntelligence({
                     Loading...
                   </>
                 ) : (
-                  'Upgrade to Premium ($29)'
+                  'Upgrade to EDGE ($19)'
                 )}
               </Button>
             </div>
@@ -874,7 +874,7 @@ export default function CompetitiveIntelligence({
               <span>Premium Feature</span>
             </div>
             <p className="text-zinc-500 text-sm mb-3">
-              Access competitive intelligence + all premium outputs for $29 one-time.
+              EDGE includes competitive intelligence and export features for $19 one-time.
             </p>
             <div className="flex gap-3">
               <Button
@@ -987,7 +987,7 @@ export default function CompetitiveIntelligence({
                     Loading checkout...
                   </>
                 ) : (
-                  'Upgrade to Premium - $29'
+                  'Upgrade to EDGE - $19'
                 )}
               </Button>
               <Button

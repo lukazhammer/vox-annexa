@@ -123,7 +123,7 @@ export default function AnnexaTerms() {
 
         <h3>Price</h3>
         <ul>
-          <li>EDGE tier: $29 USD one-time</li>
+          <li>EDGE tier: $19 USD one-time</li>
           <li>Prices may change (existing customers grandfathered)</li>
           <li>No refunds after document delivery</li>
         </ul>

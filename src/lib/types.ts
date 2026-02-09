@@ -28,7 +28,7 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
 
 export const PRICING = {
     edge: {
-        amount: 29,
+        amount: 19,
         currency: 'USD',
         description: 'One-time payment for lifetime access',
     },

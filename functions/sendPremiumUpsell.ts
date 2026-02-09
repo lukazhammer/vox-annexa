@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
 
 You generated your Annexa documents${productName ? ` for ${productName}` : ''} a week ago. Ready to take them to the next level?
 
-EDGE ($29 one-time) includes:
+EDGE ($19 one-time) includes:
 - Social bios ready to paste
 - Press kit for media
 - Email templates
