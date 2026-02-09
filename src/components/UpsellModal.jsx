@@ -3,7 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Check, Download, Loader2, Mail, CheckCircle, ExternalLink, Copy, FileText } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { getUserTier } from '@/lib/tierUtils';
+
+// Tier utilities - inline to avoid import issues
+const getUserTier = () => {
+  if (typeof window === 'undefined') return 'free';
+  return localStorage.getItem('annexa_tier') || 'free';
+};
 
 export default function UpsellModal({
   open,
@@ -416,7 +421,31 @@ export default function UpsellModal({
             </div>
 
             <div className="space-y-2">
-              <Button onClick={onUpgrade} className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12">
+              <Button 
+                onClick={async () => {
+                  // Check if running in iframe
+                  if (window.self !== window.top) {
+                    alert('Checkout works only from the published app. Please open this page directly.');
+                    return;
+                  }
+
+                  try {
+                    const response = await base44.functions.invoke('createCheckoutSession', {
+                      returnUrl: window.location.origin,
+                    });
+
+                    if (response.data.success && response.data.checkoutUrl) {
+                      window.location.href = response.data.checkoutUrl;
+                    } else {
+                      throw new Error(response.data.error || 'Failed to create checkout');
+                    }
+                  } catch (err) {
+                    console.error('Checkout error:', err);
+                    alert('Failed to start checkout. Please try again.');
+                  }
+                }}
+                className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12"
+              >
                 Upgrade ($29)
               </Button>
               <Button onClick={onDownloadFree} variant="ghost" className="w-full text-zinc-400 hover:text-white text-sm">
