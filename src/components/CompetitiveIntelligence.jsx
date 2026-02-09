@@ -450,6 +450,15 @@ export default function CompetitiveIntelligence({
                     return;
                   }
 
+                  // Store form data in localStorage for PremiumDashboard
+                  try {
+                    if (formData) {
+                      localStorage.setItem('annexa_premium_form_data', JSON.stringify(formData));
+                    }
+                  } catch (e) {
+                    console.warn('Failed to cache form data:', e);
+                  }
+
                   setCheckingOut(true);
                   try {
                     const response = await base44.functions.invoke('createCheckoutSession', {
@@ -573,6 +582,15 @@ export default function CompetitiveIntelligence({
                   if (window.self !== window.top) {
                     alert('Checkout works only from the published app. Please open this page directly.');
                     return;
+                  }
+
+                  // Store form data in localStorage for PremiumDashboard
+                  try {
+                    if (formData) {
+                      localStorage.setItem('annexa_premium_form_data', JSON.stringify(formData));
+                    }
+                  } catch (e) {
+                    console.warn('Failed to cache form data:', e);
                   }
 
                   setCheckingOut(true);

@@ -636,28 +636,50 @@ export default function Form() {
     });
   };
 
-  const handleUpgrade = () => {
+  const handleUpgrade = async () => {
     base44.analytics.track({
       eventName: 'launch_kit_upsell_clicked',
       properties: { tier: 'free' }
     });
 
-    // TODO: Implement Stripe payment
-    // For now, persist tier to localStorage (survives page refresh)
-    upgradeToPremium('placeholder_' + Date.now());
-
-    setIsPremium(true);
-    setShowUpsellModal(false);
-    navigate('/preview', {
-      state: {
-        documents: generatedDocuments?.documents,
-        socialBios: generatedDocuments?.socialBios,
-        technicalFiles: generatedDocuments?.technicalFiles,
-        competitiveIntel: competitiveIntel,
-        formData: formData,
-        tier: 'premium' // Backup in navigation state
+    // Store form data and documents in localStorage for PremiumDashboard
+    try {
+      localStorage.setItem('annexa_premium_form_data', JSON.stringify(formData));
+      if (generatedDocuments) {
+        localStorage.setItem('annexa_premium_documents', JSON.stringify({
+          documents: generatedDocuments.documents || {},
+          socialBios: generatedDocuments.socialBios || null,
+          technicalFiles: generatedDocuments.technicalFiles || null,
+        }));
       }
-    });
+    } catch (e) {
+      console.warn('Failed to cache form data:', e);
+    }
+
+    // Check if running in iframe
+    if (window.self !== window.top) {
+      alert('Checkout works only from the published app. Please open this page directly.');
+      return;
+    }
+
+    try {
+      const response = await base44.functions.invoke('createCheckoutSession', {
+        returnUrl: window.location.origin,
+        userWebsiteURL: formData.website_url || '',
+        businessName: formData.company_name || '',
+        productDescription: formData.product_description || '',
+        email: formData.contact_email || '',
+      });
+
+      if (response.data.success && response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        throw new Error(response.data.error || 'Failed to create checkout');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Failed to start checkout. Please try again.');
+    }
   };
 
   const handleSaveProgress = async (email) => {
