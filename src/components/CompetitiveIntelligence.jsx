@@ -448,14 +448,19 @@ export default function CompetitiveIntelligence({
                     alert('Checkout works only from the published app. Please open this page directly.');
                     return;
                   }
-                  
+
                   setCheckingOut(true);
                   try {
                     const response = await base44.functions.invoke('createCheckoutSession', {
                       returnUrl: window.location.origin,
                       competitorUrl: competitorUrl,
+                      userWebsiteURL: crawledWebsiteData?.url || formData.company_website || '',
+                      businessName: formData.company_name || '',
+                      productDescription: formData.product_description || '',
+                      industry: formData.industry || '',
+                      email: formData.email || '',
                     });
-                    
+
                     if (response.data.success && response.data.checkoutUrl) {
                       window.location.href = response.data.checkoutUrl;
                     } else {
@@ -568,14 +573,19 @@ export default function CompetitiveIntelligence({
                     alert('Checkout works only from the published app. Please open this page directly.');
                     return;
                   }
-                  
+
                   setCheckingOut(true);
                   try {
                     const response = await base44.functions.invoke('createCheckoutSession', {
                       returnUrl: window.location.origin,
                       competitorUrl: competitorUrl,
+                      userWebsiteURL: crawledWebsiteData?.url || formData.company_website || '',
+                      businessName: formData.company_name || '',
+                      productDescription: formData.product_description || '',
+                      industry: formData.industry || '',
+                      email: formData.email || '',
                     });
-                    
+
                     if (response.data.success && response.data.checkoutUrl) {
                       window.location.href = response.data.checkoutUrl;
                     } else {
