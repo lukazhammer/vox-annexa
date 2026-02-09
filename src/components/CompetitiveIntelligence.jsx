@@ -13,7 +13,8 @@ export default function CompetitiveIntelligence({
   tier: tierProp, // Keep prop for backward compatibility
   onComplete,
   onSkip,
-  onUpgrade
+  onUpgrade,
+  crawledWebsiteData, // New: data from URLCapture crawl
 }) {
   const [competitorUrl, setCompetitorUrl] = useState('');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -372,7 +373,10 @@ export default function CompetitiveIntelligence({
         </div>
 
         <p className="text-zinc-400 text-sm">
-          Paste a competitor URL and we'll:
+          {crawledWebsiteData
+            ? 'We already analyzed your website. Now add a competitor to compare against.'
+            : 'Paste a competitor URL and we\'ll analyze them.'
+          }
         </p>
         <ul className="text-sm text-zinc-400 space-y-1 ml-1">
           <li>• Crawl their site in real-time</li>

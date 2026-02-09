@@ -5,7 +5,11 @@ import { GoogleGenerativeAI } from "npm:@google/generative-ai@0.21.0";
 
 export default async function handler(req: Request) {
     try {
-        const { userProduct, competitor } = await req.json();
+        const body = await req.json();
+        const { userProduct, competitor } = body;
+        // Also accept alternative parameter names from URLCapture flow
+        const userBusiness = body.userBusiness || userProduct?.name || '';
+        const userIndustry = body.userIndustry || '';
 
         const apiKey = Deno.env.get('GEMINI_API_KEY');
         if (!apiKey) {
@@ -23,13 +27,15 @@ export default async function handler(req: Request) {
         const prompt = `You are analyzing competitive positioning for SaaS products.
 
 USER'S PRODUCT:
-Description: ${userProduct.description || 'Not provided'}
-Target audience: ${userProduct.targetPersona || 'Not specified'}
+Name: ${userBusiness || userProduct?.name || 'Not provided'}
+Industry: ${userIndustry || 'SaaS'}
+Description: ${userProduct?.description || 'Not provided'}
+Target audience: ${userProduct?.targetPersona || 'Not specified'}
 
 COMPETITOR:
-Name: ${competitor.name || 'Unknown'}
-URL: ${competitor.url || 'Not provided'}
-Scraped content: ${competitor.content?.substring(0, 2000) || competitor.description || 'Limited content available'}
+Name: ${competitor?.name || 'Unknown'}
+URL: ${competitor?.url || body.competitorURL || 'Not provided'}
+Scraped content: ${competitor?.content?.substring(0, 2000) || competitor?.description || 'Limited content available'}
 
 TASK:
 Generate 6-8 competitive dimensions that differentiate these products.

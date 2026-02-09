@@ -1,47 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ArrowRight, ArrowDown, ScanLine, FileText, Check } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState(null);
-  const [url, setUrl] = useState('');
-  const [scanning, setScanning] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleScan = async () => {
-    if (!url.trim()) {
-      setError('Please enter a valid URL');
-      return;
-    }
-
-    setError('');
-    setScanning(true);
-
-    try {
-      const response = await base44.functions.invoke('scanWebsite', { url });
-      
-      navigate('/form', { 
-        state: { 
-          scanResults: response.data,
-          websiteUrl: url 
-        } 
-      });
-    } catch (err) {
-      setError('Unable to scan website. Please try manual entry.');
-      setScanning(false);
-    }
+  const handleScan = () => {
+    navigate('/URLCapture');
   };
 
   const handleManual = () => {
-    navigate('/form');
+    navigate('/URLCapture');
   };
 
-  if (!mode) {
-    return (
+  return (
       <div className="py-20">
         <div className="max-w-[1200px] mx-auto px-6">
           {/* Hero Section */}
@@ -146,18 +119,21 @@ export default function Home() {
 
           {/* Secondary: Scan Existing Site */}
           <button
-            onClick={() => setMode('scan')}
+            onClick={handleScan}
             className="group bg-[#242426] border border-[rgba(250,247,242,0.12)] rounded-lg p-8 text-left hover:border-[#C24516] hover:scale-[1.02] transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-[#C24516] focus:ring-offset-2 focus:ring-offset-[#09090B] flex flex-col h-full min-h-[280px]"
           >
             <ScanLine className="w-8 h-8 text-[#C24516] mb-4" />
             <h3 className="text-2xl md:text-2xl sm:text-xl font-bold mb-3 text-[#faf7f2]">Scan Existing Site</h3>
             <p className="text-[rgba(250,247,242,0.7)] mb-6 flex-grow leading-relaxed">
-              Already have a site? Scan it and pre-fill everything we detect.
+              Already have a site? We'll analyze it and pre-fill everything we detect.
             </p>
             <div className="mt-auto">
               <button
                 className="w-full bg-transparent border border-[#C24516] text-[#faf7f2] hover:bg-[#C24516]/10 h-12 rounded-md flex items-center justify-center gap-2 transition-all duration-150 ease-out"
-                onClick={() => setMode('scan')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleScan();
+                }}
               >
                 Drop your URL <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform duration-150" />
               </button>
@@ -187,104 +163,4 @@ export default function Home() {
         </div>
       </div>
     );
-  }
-
-  if (mode === 'scan') {
-    return (
-      <div className="max-w-2xl mx-auto px-6 py-20">
-        <button
-          onClick={() => setMode(null)}
-          className="text-[rgba(250,247,242,0.7)] hover:text-[#faf7f2] mb-8 flex items-center transition-colors duration-150 focus:outline-none focus:underline"
-        >
-          ← Back
-        </button>
-
-        <h2 className="text-4xl md:text-4xl sm:text-3xl font-bold mb-4 text-[#faf7f2]">Enter your website URL</h2>
-        <p className="text-[rgba(250,247,242,0.7)] mb-8 leading-relaxed">
-          We'll scan your site to detect existing legal docs, contact info, and services. Everything we find gets pre-filled.
-        </p>
-
-        <div className="space-y-6">
-          <Input
-            type="url"
-            placeholder="https://yourwebsite.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="bg-[#242426] border-[rgba(250,247,242,0.12)] text-[#faf7f2] h-14 text-lg focus:ring-2 focus:ring-[#C24516] focus:border-[#C24516] transition-all"
-            disabled={scanning}
-          />
-
-          {error && (
-            <div className="bg-red-950/50 border border-red-800/50 rounded-lg p-4 text-red-200">
-              {error}
-            </div>
-          )}
-
-          <Button
-            onClick={handleScan}
-            disabled={scanning}
-            className="w-full bg-[#C24516] hover:bg-[#a33912] hover:scale-[1.02] active:scale-[0.98] text-white h-14 px-8 text-lg transition-all duration-150"
-          >
-            {scanning ? 'Scanning...' : 'Scan Website'}
-            {!scanning && <ArrowRight className="w-5 h-5 ml-2" />}
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[rgba(250,247,242,0.12)]"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-[#09090B] text-[rgba(250,247,242,0.5)]">or</span>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleManual}
-            variant="outline"
-            className="w-full border-[rgba(250,247,242,0.12)] text-[rgba(250,247,242,0.7)] hover:bg-[rgba(250,247,242,0.05)] hover:text-[#faf7f2] h-14 text-base transition-all duration-150"
-          >
-            Start from scratch instead →
-          </Button>
-
-          <div className="bg-[#242426] rounded-lg p-6 mt-8">
-            <h3 className="text-base font-semibold text-[#faf7f2] mb-4">What we'll detect</h3>
-            <div className="space-y-2 text-sm text-[rgba(250,247,242,0.7)]">
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <span>Privacy Policy (if published)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <span>Terms of Service (if published)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <span>Cookie Policy (if published)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <span>Contact information</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <span>Third-party service scripts</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <span>Existing legal entity information</span>
-              </div>
-            </div>
-            <p className="text-sm text-[rgba(250,247,242,0.5)] mt-4">
-              We'll pre-fill everything we find. You can edit or add to it.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (mode === 'manual') {
-    handleManual();
-    return null;
-  }
 }
