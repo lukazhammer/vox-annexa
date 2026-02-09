@@ -20,7 +20,18 @@ import { Checkbox } from '@/components/ui/checkbox';
 import CookieConsent from '@/components/CookieConsent';
 import JurisdictionNotice from '@/components/JurisdictionNotice';
 import CompetitiveIntelligence from '@/components/CompetitiveIntelligence';
-import { upgradeToPremium } from '@/lib/tierUtils';
+// Tier utilities - inline to avoid import issues
+const getUserTier = () => {
+  if (typeof window === 'undefined') return 'free';
+  return localStorage.getItem('annexa_tier') || 'free';
+};
+
+const upgradeToPremium = (sessionId) => {
+  localStorage.setItem('annexa_tier', 'premium');
+  if (sessionId) {
+    localStorage.setItem('annexa_stripe_session', sessionId);
+  }
+};
 
 export default function Form() {
   const navigate = useNavigate();
@@ -32,6 +43,9 @@ export default function Form() {
 
   // Track which fields were auto-filled from crawl
   const [autofilledFields, setAutofilledFields] = useState(new Set());
+  
+  // Track if user just returned from successful payment
+  const [highlightAnalyze, setHighlightAnalyze] = useState(false);
 
   const [formData, setFormData] = useState({
     company_name: '',
@@ -85,6 +99,28 @@ export default function Form() {
     const storedURL = localStorage.getItem('userWebsiteURL');
     const savedDraft = localStorage.getItem('vox-launch-kit-draft');
     const hasDataSource = resumeId || existingData || scanResults || isManualEntry || storedURL || savedDraft;
+    
+    // Handle Stripe payment success
+    const paymentStatus = urlParams.get('payment');
+    const tierFromUrl = urlParams.get('tier');
+    if (paymentStatus === 'success' && tierFromUrl === 'premium') {
+      upgradeToPremium('stripe_checkout_' + Date.now());
+      setIsPremium(true);
+      setHighlightAnalyze(true);
+      setShowCompetitiveIntel(true);
+      
+      // Clean up URL params
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+      
+      // Remove highlight after 5 seconds
+      setTimeout(() => setHighlightAnalyze(false), 5000);
+      
+      base44.analytics.track({
+        eventName: 'premium_upgrade_completed',
+        properties: { source: 'stripe_checkout' }
+      });
+    }
 
     if (!hasDataSource) {
       navigate('/URLCapture');
@@ -889,6 +925,7 @@ export default function Form() {
                       formData={formData}
                       tier={isPremium ? 'premium' : 'free'}
                       crawledWebsiteData={scanResults?.prefilled || null}
+                      highlightAnalyze={highlightAnalyze}
                       onComplete={(intel) => {
                         setCompetitiveIntel(intel);
                         setCurrentStep(2);
@@ -905,8 +942,7 @@ export default function Form() {
                         });
                       }}
                       onUpgrade={() => {
-                        // TODO: Implement Stripe payment
-                        setIsPremium(true);
+                        // Handled inside CompetitiveIntelligence component now
                         base44.analytics.track({
                           eventName: 'competitive_intel_upgrade_clicked',
                           properties: {}
