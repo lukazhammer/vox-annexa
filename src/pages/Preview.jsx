@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Download, Edit, CheckCircle, X, Clock, Mail } from 'lucide-react';
+import { Download, Edit, CheckCircle, Mail } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import SocialBios from '@/components/SocialBios';
 import TierDebugPanel from '@/components/TierDebugPanel';

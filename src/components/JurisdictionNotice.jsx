@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function JurisdictionNotice({ jurisdiction, country }) {
   const [isExpanded, setIsExpanded] = useState(false);

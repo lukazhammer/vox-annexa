@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Lock, Check, Loader2, Sparkles, ExternalLink } from 'lucide-react';
+import { Search, Lock, Check, Loader2, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { getUserTier, getTierFeatures } from '@/lib/tierUtils';
+import { getUserTier } from '@/lib/tierUtils';
 import { CompetitiveRadarChart } from './competitive/CompetitiveRadarChart';
 
 export default function CompetitiveIntelligence({
@@ -182,7 +182,7 @@ export default function CompetitiveIntelligence({
                 scrapedContent: result.competitor.description || result.competitor.positioning,
               }}
               onDifferentiatorAdd={(diff) => {
-                console.log('Differentiator added:', diff);
+                // Differentiator added - could track analytics here if needed
               }}
             />
           </div>
@@ -264,7 +264,7 @@ export default function CompetitiveIntelligence({
               <Lock className="w-8 h-8 text-zinc-500 mx-auto mb-3" />
               <h4 className="font-serif text-lg mb-1">Competitive Positioning Map</h4>
               <p className="text-zinc-400 text-sm mb-4">
-                Unlock visual comparison across AI-generated market dimensions.
+                Access visual comparison across AI-generated market dimensions.
               </p>
               <Button
                 onClick={onUpgrade}
@@ -409,7 +409,7 @@ export default function CompetitiveIntelligence({
               <span>Premium Feature</span>
             </div>
             <p className="text-zinc-500 text-sm mb-3">
-              Unlock competitive intelligence + all premium outputs for $29 one-time.
+              Access competitive intelligence + all premium outputs for $29 one-time.
             </p>
             <div className="flex gap-3">
               <Button

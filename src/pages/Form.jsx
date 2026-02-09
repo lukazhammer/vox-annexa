@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowRight, Loader2, Trash2, Clock, Check, HelpCircle, Info } from 'lucide-react';
+import { ArrowRight, Loader2, Trash2, Check, HelpCircle, Info } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { base44 } from '@/api/base44Client';
-import ServiceSelector from '@/components/ServiceSelector';
 import LivePreview from '@/components/LivePreview';
 import PresetSelector, { presets } from '@/components/PresetSelector';
 import CharacterBudget from '@/components/CharacterBudget';
@@ -20,7 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import CookieConsent from '@/components/CookieConsent';
 import JurisdictionNotice from '@/components/JurisdictionNotice';
 import CompetitiveIntelligence from '@/components/CompetitiveIntelligence';
-import { upgradeToPremium, getUserTier } from '@/lib/tierUtils';
+import { upgradeToPremium } from '@/lib/tierUtils';
 
 export default function Form() {
   const navigate = useNavigate();
@@ -933,7 +932,7 @@ export default function Form() {
                           value={formData.target_pain_points}
                           onChange={(e) => handleChange('target_pain_points', e.target.value)}
                           className="bg-zinc-900 border-zinc-800 text-white text-base min-h-[80px]"
-                          placeholder="What frustrates your users about current solutions?"
+                          placeholder="What frustrates your users about current alternatives?"
                           rows={3}
                         />
                       </div>

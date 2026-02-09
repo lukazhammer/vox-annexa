@@ -1,7 +1,12 @@
 import { UserTier, TierData, TierFeatures, TIER_FEATURES } from './types';
+import { base44 } from '@/api/base44Client';
 
 const STORAGE_KEY = 'annexa_user_tier';
 const TIER_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// Cache for server verification to avoid excessive API calls
+let verificationCache: { verified: boolean; timestamp: number } | null = null;
+const VERIFICATION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
  * Get the stored tier data from localStorage
@@ -85,6 +90,91 @@ export function isPremium(): boolean {
 }
 
 /**
+ * Verify premium access with server
+ * Prevents localStorage manipulation
+ * Uses cache to avoid excessive API calls
+ */
+export async function verifyPremiumAccess(): Promise<boolean> {
+    const tierData = getTierData();
+    
+    // Not premium according to localStorage
+    if (!tierData || tierData.tier !== 'premium') {
+        return false;
+    }
+    
+    // Check expiration
+    if (tierData.expiresAt && tierData.expiresAt < Date.now()) {
+        clearTierData();
+        return false;
+    }
+    
+    // Check cache first
+    if (verificationCache && 
+        Date.now() - verificationCache.timestamp < VERIFICATION_CACHE_TTL) {
+        return verificationCache.verified;
+    }
+    
+    // Verify with server (prevents localStorage manipulation)
+    try {
+        const response = await base44.functions.invoke('verifyTier', {
+            tier: tierData.tier,
+            transactionId: tierData.transactionId || ''
+        });
+        
+        const verified = response.verified === true;
+        
+        // Update cache
+        verificationCache = {
+            verified,
+            timestamp: Date.now()
+        };
+        
+        return verified;
+    } catch (error) {
+        // Fail closed for security - if verification fails, deny premium access
+        // But don't clear localStorage as it might be a temporary network issue
+        if (import.meta.env.DEV) {
+            console.warn('Tier verification failed (network error?):', error);
+        }
+        return false;
+    }
+}
+
+/**
+ * Synchronous check for premium features (uses cached verification)
+ * For immediate UI decisions, use this. For critical operations, use verifyPremiumAccess()
+ */
+export function hasPremiumFeatures(): boolean {
+    const tierData = getTierData();
+    
+    if (!tierData || tierData.tier !== 'premium') {
+        return false;
+    }
+    
+    // Check expiration
+    if (tierData.expiresAt && tierData.expiresAt < Date.now()) {
+        clearTierData();
+        return false;
+    }
+    
+    // Check if we have a valid cached verification
+    if (verificationCache && 
+        Date.now() - verificationCache.timestamp < VERIFICATION_CACHE_TTL) {
+        return verificationCache.verified;
+    }
+    
+    // Return true based on localStorage, but caller should verify with server for critical operations
+    return true;
+}
+
+/**
+ * Clear verification cache (call after logout or tier change)
+ */
+export function clearVerificationCache(): void {
+    verificationCache = null;
+}
+
+/**
  * Migrate old tier data format if it exists
  * Call once on app initialization
  */
@@ -95,9 +185,10 @@ export function migrateOldTierData(): void {
     for (const oldKey of oldKeys) {
         const oldValue = localStorage.getItem(oldKey);
         if (oldValue === 'premium' && !getTierData()) {
+            // Note: migrated_ prefix will be rejected by server verification
+            // This is intentional - migrated data needs re-verification
             setTierData('premium', 'migrated_' + Date.now());
             localStorage.removeItem(oldKey);
-            console.log(`Migrated tier data from ${oldKey}`);
             break;
         }
     }

@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
         }
       }
     } catch (err) {
-      console.log('Could not fetch homepage:', err.message);
+      // Non-critical error - homepage fetch failed, continue with other data
     }
 
     return Response.json({
