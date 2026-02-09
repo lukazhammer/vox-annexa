@@ -217,8 +217,8 @@ export default function Preview() {
 
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Premium: Social Bios */}
-          {tier === 'premium' && socialBios && (
+          {/* EDGE: Social Bios */}
+          {tier === 'edge' && socialBios && (
             <SocialBios formData={formData} socialBios={socialBios} />
           )}
 
@@ -273,7 +273,7 @@ export default function Preview() {
                 </div>
               </div>
 
-              {tier === 'premium' && (
+              {tier === 'edge' && (
                 <div className="border-2 border-green-500/50 rounded-lg p-6 bg-zinc-900">
                   <div className="flex justify-between items-start mb-2">
                     <div>

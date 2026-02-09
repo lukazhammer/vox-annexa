@@ -41,7 +41,7 @@ export default function CompetitiveIntelligence({
 
   // Use persistent tier from localStorage, fallback to prop
   const tier = getUserTier() || tierProp || 'free';
-  const isPremium = tier === 'premium';
+  const isPremium = tier === 'edge' || tier === 'premium';
 
   const canAddMore = competitors.length < 3;
   const hasAnalyzedCompetitors = competitors.some(c => c.data);

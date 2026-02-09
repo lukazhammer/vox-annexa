@@ -437,7 +437,7 @@ export default async function handler(req: Request): Promise<Response> {
       const userId = session.client_reference_id || userEmail;
       if (userId) {
         await cacheSet(`tier:${userId}`, {
-          tier: 'premium',
+          tier: 'edge',
           sessionId: session.id,
           purchasedAt: new Date().toISOString(),
         }, 60 * 60 * 24 * 365); // 1 year

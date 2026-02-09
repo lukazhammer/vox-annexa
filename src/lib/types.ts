@@ -1,4 +1,4 @@
-export type UserTier = 'free' | 'premium';
+export type UserTier = 'free' | 'edge';
 
 export interface TierData {
     tier: UserTier;
@@ -10,24 +10,24 @@ export interface TierData {
 export interface TierFeatures {
     canExport: boolean;
     canEmail: boolean;
-    hasPremiumFeatures: boolean;
+    hasEdgeFeatures: boolean;
 }
 
 export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     free: {
         canExport: false,
         canEmail: false,
-        hasPremiumFeatures: false,
+        hasEdgeFeatures: false,
     },
-    premium: {
+    edge: {
         canExport: true,
         canEmail: true,
-        hasPremiumFeatures: true,
+        hasEdgeFeatures: true,
     },
 };
 
 export const PRICING = {
-    premium: {
+    edge: {
         amount: 29,
         currency: 'USD',
         description: 'One-time payment for lifetime access',

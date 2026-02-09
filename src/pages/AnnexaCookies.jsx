@@ -78,7 +78,7 @@ export default function AnnexaCookies() {
 
         <h2>Third-Party Cookies</h2>
         <p>
-          When you upgrade to Premium, Stripe may set cookies during payment processing. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-[#C24516] hover:underline">Stripe's privacy policy</a>.
+          When you upgrade to EDGE, Stripe may set cookies during payment processing. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-[#C24516] hover:underline">Stripe's privacy policy</a>.
         </p>
 
         <h2>How to Control Cookies</h2>

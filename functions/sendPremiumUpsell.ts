@@ -16,14 +16,14 @@ Deno.serve(async (req) => {
 
 You generated your Annexa documents${productName ? ` for ${productName}` : ''} a week ago. Ready to take them to the next level?
 
-Premium ($29 one-time) includes:
+EDGE ($29 one-time) includes:
 - Social bios ready to paste
 - Press kit for media
 - Email templates
 - Remove watermarks
 - Markdown exports
 
-${upgradeLink ? `Upgrade to Premium:\n${upgradeLink}\n\n` : ''}Already had them reviewed by a lawyer? Great! These premium additions will round out your launch.
+${upgradeLink ? `Upgrade to EDGE:\n${upgradeLink}\n\n` : ''}Already had them reviewed by a lawyer? Great! These EDGE additions will round out your launch.
 
 Best,
 The Annexa Team

@@ -25,7 +25,7 @@ export default function UpsellModal({
 }) {
   // Use persistent tier from localStorage, fallback to props
   const tier = getUserTier() || tierProp || 'free';
-  const isPremium = tier === 'premium' || isPremiumProp;
+  const isPremium = tier === 'edge' || tier === 'premium' || isPremiumProp;
 
   const [downloading, setDownloading] = useState(false);
   const [emailing, setEmailing] = useState(false);
@@ -93,7 +93,7 @@ export default function UpsellModal({
   };
 
   const handleDownloadMarkdown = async () => {
-    if (tier !== 'premium') return;
+    if (!isPremium) return;
 
     setDownloading(true);
     setDownloadError(null);
@@ -147,7 +147,7 @@ export default function UpsellModal({
   };
 
   // Premium modal
-  if (tier === 'premium') {
+  if (isPremium) {
     const hasCompetitiveIntel = competitiveIntel && competitiveIntel.competitor;
 
     return (

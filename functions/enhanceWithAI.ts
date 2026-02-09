@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
       });
       return Response.json({
         success: false,
-        error: 'Rate limit exceeded. Try again tomorrow or upgrade to premium.',
+        error: 'Rate limit exceeded. Try again tomorrow or upgrade to EDGE.',
         rate_limited: true
       }, { status: 429 });
     }

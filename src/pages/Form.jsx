@@ -19,18 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import CookieConsent from '@/components/CookieConsent';
 import JurisdictionNotice from '@/components/JurisdictionNotice';
 import CompetitiveIntelligence from '@/components/CompetitiveIntelligence';
-// Tier utilities - inline to avoid import issues
-const getUserTier = () => {
-  if (typeof window === 'undefined') return 'free';
-  return localStorage.getItem('annexa_tier') || 'free';
-};
-
-const upgradeToPremium = (sessionId) => {
-  localStorage.setItem('annexa_tier', 'premium');
-  if (sessionId) {
-    localStorage.setItem('annexa_stripe_session', sessionId);
-  }
-};
+import { upgradeToEdge, getUserTier } from '@/lib/tierUtils';
 
 export default function Form() {
   const navigate = useNavigate();
@@ -56,7 +45,7 @@ export default function Form() {
     cookie_level: 'analytics',
     services_used: '',
     preset: 'standard',
-    // Premium fields
+    // EDGE fields
     brand_positioning: '',
     key_competitors: '',
     target_pain_points: '',
@@ -71,7 +60,7 @@ export default function Form() {
   const [customCookies, setCustomCookies] = useState('analytics');
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   const [generatedDocuments, setGeneratedDocuments] = useState(null);
-  const [isPremium, setIsPremium] = useState(() => getUserTier() === 'premium');
+  const [isEdge, setIsEdge] = useState(() => getUserTier() === 'edge');
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [draftTimestamp, setDraftTimestamp] = useState(null);
@@ -102,9 +91,15 @@ export default function Form() {
     // Handle Stripe payment success
     const paymentStatus = urlParams.get('payment');
     const tierFromUrl = urlParams.get('tier');
-    if (paymentStatus === 'success' && tierFromUrl === 'premium') {
-      upgradeToPremium('stripe_checkout_' + Date.now());
-      setIsPremium(true);
+    const checkoutSessionId = urlParams.get('session_id') || urlParams.get('stripe_session_id');
+    const checkoutHint = urlParams.get('checkout');
+    if (
+      checkoutSessionId ||
+      checkoutHint === 'success' ||
+      (paymentStatus === 'success' && (tierFromUrl === 'premium' || tierFromUrl === 'edge'))
+    ) {
+      upgradeToEdge(checkoutSessionId || 'stripe_checkout_' + Date.now());
+      setIsEdge(true);
       setHighlightAnalyze(true);
       setShowCompetitiveIntel(true);
       
@@ -116,7 +111,7 @@ export default function Form() {
       setTimeout(() => setHighlightAnalyze(false), 5000);
       
       base44.analytics.track({
-        eventName: 'premium_upgrade_completed',
+        eventName: 'edge_upgrade_completed',
         properties: { source: 'stripe_checkout' }
       });
     }
@@ -262,7 +257,7 @@ export default function Form() {
 
   useEffect(() => {
     const syncTier = () => {
-      setIsPremium(getUserTier() === 'premium');
+      setIsEdge(getUserTier() === 'edge');
     };
 
     syncTier();
@@ -629,7 +624,7 @@ export default function Form() {
 
   const handleDownloadFree = () => {
     const persistedTier = getUserTier();
-    const resolvedTier = persistedTier === 'premium' || isPremium ? 'premium' : 'free';
+    const resolvedTier = persistedTier === 'edge' || isEdge ? 'edge' : 'free';
 
     base44.analytics.track({
       eventName: 'launch_kit_upsell_dismissed',
@@ -948,7 +943,7 @@ export default function Form() {
                   <div className="border-t border-zinc-700 pt-6 mt-6">
                     <CompetitiveIntelligence
                       formData={formData}
-                      tier={isPremium ? 'premium' : 'free'}
+                      tier={isEdge ? 'edge' : 'free'}
                       crawledWebsiteData={scanResults?.prefilled || null}
                       highlightAnalyze={highlightAnalyze}
                       onComplete={(intel) => {
@@ -963,13 +958,13 @@ export default function Form() {
                         setCurrentStep(2);
                         base44.analytics.track({
                           eventName: 'competitive_intel_skipped',
-                          properties: { tier: isPremium ? 'premium' : 'free' }
+                          properties: { tier: isEdge ? 'edge' : 'free' }
                         });
                       }}
                       onUpgrade={() => {
                         // Handled inside CompetitiveIntelligence component now
                         base44.analytics.track({
-                          eventName: 'competitive_intel_upgrade_clicked',
+                          eventName: 'competitive_intel_edge_clicked',
                           properties: {}
                         });
                       }}
@@ -1088,12 +1083,12 @@ export default function Form() {
                     )}
                   </div>
 
-                  {/* Premium Fields Section */}
-                  {isPremium && (
+                  {/* EDGE Fields Section */}
+                  {isEdge && (
                     <div className="mt-6 pt-6 border-t border-zinc-700 space-y-4">
                       <div className="bg-[var(--app-accent)]/10 border border-[var(--app-accent)]/30 rounded-lg p-4 mb-4">
                         <p className="text-sm text-zinc-300">
-                          <span className="text-[var(--app-accent)] font-semibold">Premium:</span> Answer these to get highly customized documents and social bios
+                          <span className="text-[var(--app-accent)] font-semibold">EDGE:</span> Answer these to get competitive analysis and social bios
                         </p>
                       </div>
 
@@ -1342,13 +1337,13 @@ export default function Form() {
         onOpenChange={setShowUpsellModal}
         onDownloadFree={handleDownloadFree}
         onUpgrade={handleUpgrade}
-        isPremium={isPremium}
+        isEdge={isEdge}
         documents={generatedDocuments?.documents}
         socialBios={generatedDocuments?.socialBios}
         technicalFiles={generatedDocuments?.technicalFiles}
         competitiveIntel={competitiveIntel}
         formData={formData}
-        tier={isPremium ? 'premium' : 'free'}
+        tier={isEdge ? 'edge' : 'free'}
       />
 
       <ExitIntentModal

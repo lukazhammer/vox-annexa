@@ -60,7 +60,7 @@ export default function AnnexaPrivacy() {
           <li>Anonymous analytics (page views, completion rates)</li>
         </ul>
 
-        <h3>Premium Tier:</h3>
+        <h3>EDGE Tier:</h3>
         <ul>
           <li>Everything in Free tier</li>
           <li>Payment processing (via Stripe - see their privacy policy)</li>
@@ -77,7 +77,7 @@ export default function AnnexaPrivacy() {
           <li>No database storage of your content</li>
         </ul>
 
-        <h3>Premium Tier:</h3>
+        <h3>EDGE Tier:</h3>
         <ul>
           <li>Generated documents stored for 30 days (for re-download)</li>
           <li>Payment information stored by Stripe (not by us)</li>
@@ -88,7 +88,7 @@ export default function AnnexaPrivacy() {
         <ul>
           <li><strong>LocalStorage:</strong> Until you clear browser data</li>
           <li><strong>Server logs:</strong> 30 days</li>
-          <li><strong>Premium documents:</strong> 30 days</li>
+          <li><strong>EDGE documents:</strong> 30 days</li>
           <li><strong>Payment records:</strong> 7 years (required by law)</li>
         </ul>
 
@@ -126,7 +126,7 @@ export default function AnnexaPrivacy() {
           <li>Vercel Analytics (anonymous page views)</li>
         </ul>
 
-        <h3>Premium Tier Only:</h3>
+        <h3>EDGE Tier Only:</h3>
         <ul>
           <li>Stripe (payment processing)</li>
           <li>Resend (email delivery)</li>

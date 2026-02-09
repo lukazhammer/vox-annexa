@@ -18,6 +18,12 @@ export function getTierData(): TierData | null {
         if (!stored) return null;
 
         const data: TierData = JSON.parse(stored);
+        // Backward compatibility: migrate old "premium" value to "edge".
+        if ((data as TierData | { tier?: string }).tier === 'premium') {
+            const migratedData: TierData = { ...data, tier: 'edge' };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(migratedData));
+            return migratedData;
+        }
 
         // Check if expired
         if (data.expiresAt < Date.now()) {
@@ -51,7 +57,7 @@ export function setTierData(tier: UserTier, transactionId?: string): void {
 }
 
 /**
- * Get the current user tier (free or premium)
+ * Get the current user tier (free or edge)
  * Checks localStorage first, falls back to 'free'
  */
 export function getUserTier(): UserTier {
@@ -68,11 +74,18 @@ export function getTierFeatures(tier?: UserTier): TierFeatures {
 }
 
 /**
- * Upgrade user to premium tier
+ * Upgrade user to EDGE tier
  * @param transactionId - Optional Stripe transaction ID
  */
+export function upgradeToEdge(transactionId?: string): void {
+    setTierData('edge', transactionId);
+}
+
+/**
+ * Backward-compatible alias
+ */
 export function upgradeToPremium(transactionId?: string): void {
-    setTierData('premium', transactionId);
+    upgradeToEdge(transactionId);
 }
 
 /**
@@ -83,10 +96,17 @@ export function clearTierData(): void {
 }
 
 /**
- * Check if user has premium tier
+ * Check if user has EDGE tier
+ */
+export function isEdge(): boolean {
+    return getUserTier() === 'edge';
+}
+
+/**
+ * Backward-compatible alias
  */
 export function isPremium(): boolean {
-    return getUserTier() === 'premium';
+    return isEdge();
 }
 
 /**
@@ -97,8 +117,8 @@ export function isPremium(): boolean {
 export async function verifyPremiumAccess(): Promise<boolean> {
     const tierData = getTierData();
     
-    // Not premium according to localStorage
-    if (!tierData || tierData.tier !== 'premium') {
+    // Not EDGE according to localStorage
+    if (!tierData || tierData.tier !== 'edge') {
         return false;
     }
     
@@ -147,7 +167,7 @@ export async function verifyPremiumAccess(): Promise<boolean> {
 export function hasPremiumFeatures(): boolean {
     const tierData = getTierData();
     
-    if (!tierData || tierData.tier !== 'premium') {
+    if (!tierData || tierData.tier !== 'edge') {
         return false;
     }
     
@@ -185,9 +205,7 @@ export function migrateOldTierData(): void {
     for (const oldKey of oldKeys) {
         const oldValue = localStorage.getItem(oldKey);
         if (oldValue === 'premium' && !getTierData()) {
-            // Note: migrated_ prefix will be rejected by server verification
-            // This is intentional - migrated data needs re-verification
-            setTierData('premium', 'migrated_' + Date.now());
+            setTierData('edge', 'migrated_' + Date.now());
             localStorage.removeItem(oldKey);
             break;
         }

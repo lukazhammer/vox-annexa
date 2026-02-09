@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       status: 200,
       headers: {
         'Content-Type': 'application/zip',
-        'Content-Disposition': `attachment; filename="launch-kit-premium-${productName.toLowerCase().replace(/\s+/g, '-')}.zip"`
+        'Content-Disposition': `attachment; filename="launch-kit-edge-${productName.toLowerCase().replace(/\s+/g, '-')}.zip"`
       }
     });
   } catch (error) {

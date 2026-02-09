@@ -11,21 +11,21 @@ Deno.serve(async (req) => {
 
     await base44.integrations.Core.SendEmail({
       to: email,
-      subject: `Annexa Premium - You're All Set`,
+      subject: `Annexa EDGE - You're All Set`,
       body: `Hi there,
 
-Thanks for upgrading to Annexa Premium!
+Thanks for upgrading to Annexa EDGE!
 
 Receipt: $29.00${receiptLink ? ` - Download receipt: ${receiptLink}` : ''}
 
-Your premium package is ready:
+Your EDGE package is ready:
 - All documents (no watermark)
 - Social media bios (Twitter, LinkedIn, Product Hunt)
 - Welcome email templates
 - Press kit
 - Markdown exports
 
-${downloadLink ? `Download your premium package:\n${downloadLink}\n\n` : ''}─────────────────
+${downloadLink ? `Download your EDGE package:\n${downloadLink}\n\n` : ''}─────────────────
 
 Remember: Get these reviewed by a lawyer before going live. It's what the pros do.
 

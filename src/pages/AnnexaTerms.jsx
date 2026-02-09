@@ -119,11 +119,11 @@ export default function AnnexaTerms() {
           <li>If your local laws conflict, your local laws may apply</li>
         </ul>
 
-        <h2>Payment Terms (Premium Tier)</h2>
+        <h2>Payment Terms (EDGE Tier)</h2>
 
         <h3>Price</h3>
         <ul>
-          <li>Premium tier: $29 USD one-time</li>
+          <li>EDGE tier: $29 USD one-time</li>
           <li>Prices may change (existing customers grandfathered)</li>
           <li>No refunds after document delivery</li>
         </ul>

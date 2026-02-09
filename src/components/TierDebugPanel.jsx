@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserTier, upgradeToPremium, clearTierData, getTierData } from '@/lib/tierUtils';
+import { getUserTier, upgradeToEdge, clearTierData, getTierData } from '@/lib/tierUtils';
 
 /**
  * Development-only debug panel for testing tier functionality
@@ -50,7 +50,7 @@ export default function TierDebugPanel() {
             <div className="space-y-2 text-xs text-zinc-300 mb-4">
                 <div className="flex items-center justify-between">
                     <span className="text-zinc-500">Current Tier:</span>
-                    <span className={`font-bold ${tier === 'premium' ? 'text-green-500' : 'text-zinc-400'}`}>
+                    <span className={`font-bold ${tier === 'edge' ? 'text-green-500' : 'text-zinc-400'}`}>
                         {tier.toUpperCase()}
                     </span>
                 </div>
@@ -84,13 +84,13 @@ export default function TierDebugPanel() {
             <div className="flex gap-2">
                 <button
                     onClick={() => {
-                        upgradeToPremium('debug_' + Date.now());
-                        setTier('premium');
+                        upgradeToEdge('debug_' + Date.now());
+                        setTier('edge');
                         setTierData(getTierData());
                     }}
                     className="flex-1 px-2 py-1.5 bg-[#C24516] hover:bg-[#a33912] text-white rounded text-xs font-medium transition-colors"
                 >
-                    Set Premium
+                    Set EDGE
                 </button>
                 <button
                     onClick={() => {
