@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint . --quiet",
+    "copycheck": "node scripts/copy-guardrails.mjs",
+    "lint": "eslint . --quiet && npm run copycheck",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
