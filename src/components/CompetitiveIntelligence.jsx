@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Lock, Check, Loader2, Sparkles } from 'lucide-react';
+import { Search, Lock, Check, Loader2, Lightbulb } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { getUserTier } from '@/lib/tierUtils';
 import { CompetitiveRadarChart } from './competitive/CompetitiveRadarChart';
+import DraftOptionsButton from '@/components/DraftOptionsButton';
 
 export default function CompetitiveIntelligence({
   formData,
@@ -30,6 +31,12 @@ export default function CompetitiveIntelligence({
   // Use persistent tier from localStorage, fallback to prop
   const tier = getUserTier() || tierProp || 'free';
   const isEdge = tier === 'edge';
+  const draftOptionsContext = {
+    productName: formData.company_name || '',
+    oneLiner: formData.product_description || '',
+    audience: formData.target_audience || '',
+    differentiators: competitor?.positioning || '',
+  };
 
   const handleAnalyzeClick = () => {
     if (!isEdge) {
@@ -100,7 +107,7 @@ export default function CompetitiveIntelligence({
       });
 
       if (!response.data.success) {
-        throw new Error(response.data.error || 'Failed to generate intelligence');
+        throw new Error(response.data.error || 'Failed to create intelligence');
       }
 
       setResult({
@@ -116,7 +123,7 @@ export default function CompetitiveIntelligence({
       });
 
     } catch (err) {
-      setError(err.message || 'Generation failed');
+      setError(err.message || 'Creation failed');
     } finally {
       setGenerating(false);
     }
@@ -166,7 +173,7 @@ export default function CompetitiveIntelligence({
         </ul>
 
         <div className="bg-zinc-800/50 rounded p-3 text-xs text-zinc-400 space-y-1">
-          <p><strong>Search terms generated:</strong> {result.searchTerms.length}</p>
+          <p><strong>Search terms created:</strong> {result.searchTerms.length}</p>
           <p><strong>Recommendation scenarios:</strong> {result.recommendations.recommend_when.length + result.recommendations.do_not_recommend_when.length}</p>
         </div>
 
@@ -174,7 +181,7 @@ export default function CompetitiveIntelligence({
         {isEdge && result.competitor && (
           <div className="border-t border-zinc-800 pt-6 mt-4">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-[#C24516]" />
+              <Lightbulb className="w-5 h-5 text-[#C24516]" />
               <h4 className="font-serif text-lg">Competitive Positioning Map</h4>
             </div>
             <p className="text-zinc-400 text-sm mb-4">
@@ -243,7 +250,7 @@ export default function CompetitiveIntelligence({
         {isEdge ? (
           <div className="border-t border-zinc-800 pt-6">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-[#C24516]" />
+              <Lightbulb className="w-5 h-5 text-[#C24516]" />
               <h4 className="font-serif text-lg">Competitive Positioning Map</h4>
             </div>
             <p className="text-zinc-400 text-sm mb-4">
@@ -275,7 +282,7 @@ export default function CompetitiveIntelligence({
               <Lock className="w-8 h-8 text-zinc-500 mx-auto mb-3" />
               <h4 className="font-serif text-lg mb-1">Competitive Positioning Map</h4>
               <p className="text-zinc-400 text-sm mb-4">
-                Compare products across AI-generated market dimensions.
+                Compare products across AI-assisted market dimensions.
               </p>
               <Button
                 onClick={onUpgrade}
@@ -297,6 +304,14 @@ export default function CompetitiveIntelligence({
             placeholder={`Simpler, async-first design. No complex gantt charts. Built specifically for remote teams under 50 people.`}
             className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 min-h-[80px]"
           />
+          <DraftOptionsButton
+            fieldKey="differentiation"
+            fieldLabel="How are you different?"
+            currentValue={differentiation}
+            tier={isEdge ? 'edge' : 'free'}
+            formContext={draftOptionsContext}
+            onSelect={(option) => setDifferentiation(option)}
+          />
         </div>
 
         {error && (
@@ -311,7 +326,7 @@ export default function CompetitiveIntelligence({
           {generating ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Generating strategy...
+              Preparing strategy...
             </>
           ) : (
             'Continue'
@@ -358,7 +373,7 @@ export default function CompetitiveIntelligence({
               <div className="w-4 h-4" />
             )}
             <span className={analysisStep >= 3 ? 'text-zinc-300' : 'text-zinc-600'}>
-              Generating differentiation strategy
+              Preparing differentiation strategy
             </span>
           </div>
         </div>
@@ -388,7 +403,7 @@ export default function CompetitiveIntelligence({
         <ul className="text-sm text-zinc-400 space-y-1 ml-1">
           <li>• Crawl their site in real-time</li>
           <li>• Extract their positioning & keywords</li>
-          <li>• Generate differentiation strategy</li>
+          <li>• Create differentiation strategy</li>
           <li>• Create smarter SEO/AEO for your product</li>
         </ul>
 
@@ -465,7 +480,7 @@ export default function CompetitiveIntelligence({
 
           <div className="space-y-4">
             <p className="text-zinc-300">
-              This feature analyzes your competitor and generates:
+              This feature analyzes your competitor and creates:
             </p>
 
             <ul className="space-y-2 text-sm">
@@ -501,7 +516,7 @@ export default function CompetitiveIntelligence({
                 <p><strong>Analyzed:</strong> Asana</p>
                 <p><strong>Their positioning:</strong> "Work management for enterprise teams"</p>
                 <p><strong>Suggested differentiation:</strong><br />"Simpler, async-first, built for remote teams under 50"</p>
-                <p><strong>Generated search terms:</strong></p>
+                <p><strong>Created search terms:</strong></p>
                 <ul className="ml-2">
                   <li>• "asana alternative for small teams"</li>
                   <li>• "simple remote project management"</li>

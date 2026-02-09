@@ -12,7 +12,7 @@ import PresetSelector, { presets } from '@/components/PresetSelector';
 import CharacterBudget from '@/components/CharacterBudget';
 import UpsellModal from '@/components/UpsellModal';
 import ExitIntentModal from '@/components/ExitIntentModal';
-import AIRefiner from '@/components/AIRefiner';
+import DraftOptionsButton from '@/components/DraftOptionsButton';
 import DraftModal from '@/components/DraftModal';
 import LegalBanner from '@/components/LegalBanner';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -72,6 +72,17 @@ export default function Form() {
   const [transforming, setTransforming] = useState(false);
   const [competitiveIntel, setCompetitiveIntel] = useState(null);
   const [showCompetitiveIntel, setShowCompetitiveIntel] = useState(false);
+
+  const draftOptionsContext = {
+    productName: formData.company_name,
+    oneLiner: formData.product_description,
+    audience: formData.target_audience || '',
+    differentiators: [
+      formData.brand_positioning,
+      formData.target_pain_points,
+      formData.core_features
+    ].filter(Boolean).join(' | ')
+  };
 
   useEffect(() => {
     // Detect user location
@@ -488,7 +499,7 @@ export default function Form() {
 
       const progress = calculateProgress();
       base44.analytics.track({
-        eventName: 'launch_kit_generated',
+        eventName: 'launch_kit_created',
         properties: {
           preset_used: formData.preset,
           fields_filled: progress.foundation.completed + progress.legalBasics.completed + progress.contact.completed,
@@ -501,7 +512,7 @@ export default function Form() {
     } catch (err) {
       setGenerationError(err.message || 'Something went wrong. Please try again.');
       base44.analytics.track({
-        eventName: 'launch_kit_generation_failed',
+        eventName: 'launch_kit_creation_failed',
         properties: { error: err.message }
       });
       setGenerating(false);
@@ -762,10 +773,13 @@ export default function Form() {
                   {formData.product_description && formData.product_description.length > 0 && formData.product_description.length < 50 && (
                     <p className="text-amber-500 text-xs mt-2">💡 Be more specific about what your product does. Example: "Project management for remote teams" not just "A productivity tool"</p>
                   )}
-                  <AIRefiner
-                    value={formData.product_description}
-                    onSelect={(refinement) => handleChange('product_description', refinement)}
-                    fieldName="product_description"
+                  <DraftOptionsButton
+                    fieldKey="product_description"
+                    fieldLabel="Describe your product in one sentence"
+                    currentValue={formData.product_description}
+                    tier={isEdge ? 'edge' : 'free'}
+                    formContext={draftOptionsContext}
+                    onSelect={(option) => handleChange('product_description', option)}
                   />
                   <CharacterBudget value={formData.product_description} min={50} ideal={150} />
                 </div>
@@ -847,6 +861,14 @@ export default function Form() {
                     {errors.country && touched.country && (
                       <p className="text-red-500 text-xs mt-1">{errors.country}</p>
                     )}
+                    <DraftOptionsButton
+                      fieldKey="country"
+                      fieldLabel="Where is your company based?"
+                      currentValue={formData.country}
+                      tier={isEdge ? 'edge' : 'free'}
+                      formContext={draftOptionsContext}
+                      onSelect={(option) => handleChange('country', option)}
+                    />
                     {formData.jurisdiction && (
                       <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded px-3 py-2">
                         <Info className="w-3.5 h-3.5 text-[#C24516] flex-shrink-0" />
@@ -908,6 +930,14 @@ export default function Form() {
                     {errors.company_lead && touched.company_lead && (
                       <p className="text-red-500 text-xs mt-1">{errors.company_lead}</p>
                     )}
+                    <DraftOptionsButton
+                      fieldKey="company_lead"
+                      fieldLabel="Who's building this?"
+                      currentValue={formData.company_lead}
+                      tier={isEdge ? 'edge' : 'free'}
+                      formContext={draftOptionsContext}
+                      onSelect={(option) => handleChange('company_lead', option)}
+                    />
                   </div>
 
                   <div>
@@ -921,7 +951,7 @@ export default function Form() {
                         }`}
                       placeholder="hello@acme.com"
                     />
-                    <p className="text-zinc-500 text-xs mt-1">Used in your generated docs if provided.</p>
+                    <p className="text-zinc-500 text-xs mt-1">Included in your docs if provided.</p>
                     {errors.contact_email && touched.contact_email && (
                       <p className="text-red-500 text-xs mt-1">{errors.contact_email}</p>
                     )}
@@ -945,6 +975,14 @@ export default function Form() {
                           placeholder="How do you want to be perceived? What makes you different from alternatives?"
                           rows={3}
                         />
+                        <DraftOptionsButton
+                          fieldKey="brand_positioning"
+                          fieldLabel="Brand positioning"
+                          currentValue={formData.brand_positioning}
+                          tier={isEdge ? 'edge' : 'free'}
+                          formContext={draftOptionsContext}
+                          onSelect={(option) => handleChange('brand_positioning', option)}
+                        />
                       </div>
 
                       <div>
@@ -954,6 +992,14 @@ export default function Form() {
                           onChange={(e) => handleChange('key_competitors', e.target.value)}
                           className="bg-zinc-900 border-zinc-800 text-white text-base h-10"
                           placeholder="Notion, Airtable, Monday.com"
+                        />
+                        <DraftOptionsButton
+                          fieldKey="key_competitors"
+                          fieldLabel="Key competitors"
+                          currentValue={formData.key_competitors}
+                          tier={isEdge ? 'edge' : 'free'}
+                          formContext={draftOptionsContext}
+                          onSelect={(option) => handleChange('key_competitors', option)}
                         />
                       </div>
 
@@ -966,6 +1012,14 @@ export default function Form() {
                           placeholder="What frustrates your users about current solutions?"
                           rows={3}
                         />
+                        <DraftOptionsButton
+                          fieldKey="target_pain_points"
+                          fieldLabel="Target audience pain points"
+                          currentValue={formData.target_pain_points}
+                          tier={isEdge ? 'edge' : 'free'}
+                          formContext={draftOptionsContext}
+                          onSelect={(option) => handleChange('target_pain_points', option)}
+                        />
                       </div>
 
                       <div>
@@ -976,6 +1030,14 @@ export default function Form() {
                           className="bg-zinc-900 border-zinc-800 text-white text-base min-h-[100px]"
                           placeholder="- Real-time collaboration&#10;- Built-in version control&#10;- API integrations"
                           rows={4}
+                        />
+                        <DraftOptionsButton
+                          fieldKey="core_features"
+                          fieldLabel="Core features"
+                          currentValue={formData.core_features}
+                          tier={isEdge ? 'edge' : 'free'}
+                          formContext={draftOptionsContext}
+                          onSelect={(option) => handleChange('core_features', option)}
                         />
                       </div>
 
