@@ -22,14 +22,23 @@ async function crawlWebsite(url) {
 
     const response = await fetch(normalizedUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Annexa/1.0; +https://annexa.vox-animus.com)',
-        'Accept': 'text/html,application/xhtml+xml'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Cache-Control': 'no-cache',
       },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(15000),
+      redirect: 'follow',
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}`);
+      if (response.status === 403 || response.status === 401) {
+        throw new Error(`Website blocked access (${response.status}). Try a different competitor URL.`);
+      }
+      if (response.status === 404) {
+        throw new Error(`Page not found. Please check the URL.`);
+      }
+      throw new Error(`Request failed with status ${response.status}`);
     }
 
     const html = await response.text();
@@ -73,7 +82,13 @@ async function crawlWebsite(url) {
     };
   } catch (error) {
     console.error('Crawl error:', error);
-    throw new Error(`Could not crawl website: ${error.message}`);
+    if (error.name === 'TimeoutError' || error.message?.includes('timeout')) {
+      throw new Error(`Website took too long to respond. Try a different URL.`);
+    }
+    if (error.message?.includes('blocked') || error.message?.includes('403') || error.message?.includes('401')) {
+      throw error;
+    }
+    throw new Error(`Could not access this website. Some sites block automated analysis. Try a different competitor.`);
   }
 }
 

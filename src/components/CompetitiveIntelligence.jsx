@@ -96,6 +96,7 @@ export default function CompetitiveIntelligence({
     } catch (err) {
       setError(err.message || 'Analysis failed. Please check the URL and try again.');
       setAnalyzing(false);
+      setAnalysisStep(0);
       base44.analytics.track({
         eventName: 'competitive_intel_failed',
         properties: { error: err.message }
