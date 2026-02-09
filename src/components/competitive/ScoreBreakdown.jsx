@@ -17,15 +17,15 @@ export function ScoreBreakdown({ axes, scores }) {
                     <thead className="bg-zinc-900/50">
                         <tr>
                             <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-400">Dimension</th>
-                            <th className="px-4 py-3 text-center text-sm font-semibold text-pink-400 w-24">Competitor</th>
-                            <th className="px-4 py-3 text-center text-sm font-semibold text-blue-400 w-24">You</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-[#C24516] w-24">You</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-zinc-400 w-24">Competitor</th>
                             <th className="px-4 py-3 text-center text-sm font-semibold text-zinc-400 w-24">Gap</th>
                         </tr>
                     </thead>
                     <tbody>
                         {axes.map((axis, i) => {
-                            const competitorScore = scores.competitor[i] || 0;
                             const userScore = scores.user[i] || 0;
+                            const competitorScore = scores.competitor[i] || 0;
                             const gap = userScore - competitorScore;
 
                             return (
@@ -41,14 +41,14 @@ export function ScoreBreakdown({ axes, scores }) {
                                     </td>
                                     <td className="px-4 py-3 text-center">
                                         <div className="flex flex-col items-center">
-                                            <span className="text-pink-400 font-semibold text-lg">{competitorScore}</span>
-                                            <ScoreBar score={competitorScore} color="pink" />
+                                            <span className="text-[#C24516] font-semibold text-lg">{userScore}</span>
+                                            <ScoreBar score={userScore} variant="accent" />
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 text-center">
                                         <div className="flex flex-col items-center">
-                                            <span className="text-blue-400 font-semibold text-lg">{userScore}</span>
-                                            <ScoreBar score={userScore} color="blue" />
+                                            <span className="text-zinc-400 font-semibold text-lg">{competitorScore}</span>
+                                            <ScoreBar score={competitorScore} variant="muted" />
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 text-center">
@@ -71,11 +71,11 @@ export function ScoreBreakdown({ axes, scores }) {
                 <div className="flex justify-between items-center text-sm">
                     <span className="text-zinc-400">Average Scores</span>
                     <div className="flex gap-6">
-                        <span className="text-pink-400">
-                            Competitor: {Math.round(scores.competitor.reduce((a, b) => a + b, 0) / scores.competitor.length) || 0}
-                        </span>
-                        <span className="text-blue-400">
+                        <span className="text-[#C24516]">
                             You: {Math.round(scores.user.reduce((a, b) => a + b, 0) / scores.user.length) || 0}
+                        </span>
+                        <span className="text-zinc-400">
+                            Competitor: {Math.round(scores.competitor.reduce((a, b) => a + b, 0) / scores.competitor.length) || 0}
                         </span>
                     </div>
                 </div>
@@ -85,13 +85,13 @@ export function ScoreBreakdown({ axes, scores }) {
 }
 
 // Mini score bar visualization
-function ScoreBar({ score, color }) {
-    const colorClass = color === 'pink' ? 'bg-pink-500' : 'bg-blue-500';
+function ScoreBar({ score, variant }) {
+    const barClass = variant === 'accent' ? 'bg-[#C24516]' : 'bg-zinc-500';
 
     return (
         <div className="w-14 h-1.5 bg-zinc-700 rounded-full mt-1 overflow-hidden">
             <div
-                className={`h-full ${colorClass} rounded-full transition-all duration-500`}
+                className={`h-full ${barClass} rounded-full transition-all duration-500`}
                 style={{ width: `${score}%` }}
             />
         </div>
