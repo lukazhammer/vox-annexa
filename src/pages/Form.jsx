@@ -13,6 +13,7 @@ import CharacterBudget from '@/components/CharacterBudget';
 import UpsellModal from '@/components/UpsellModal';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import AIRefiner from '@/components/AIRefiner';
+import AIRefineButton from '@/components/AIRefineButton';
 import DraftModal from '@/components/DraftModal';
 import LegalBanner from '@/components/LegalBanner';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,9 +25,13 @@ import { upgradeToPremium } from '@/lib/tierUtils';
 export default function Form() {
   const navigate = useNavigate();
   const location = useLocation();
-  const scanResults = location.state?.scanResults;
-  const websiteUrl = location.state?.websiteUrl;
+  const scanResults = location.state?.scanResults || location.state?.crawledData;
+  const websiteUrl = location.state?.websiteUrl || localStorage.getItem('userWebsiteURL') || '';
   const existingData = location.state?.formData;
+  const isManualEntry = location.state?.manualEntry === true;
+
+  // Track which fields were auto-filled from crawl
+  const [autofilledFields, setAutofilledFields] = useState(new Set());
 
   const [formData, setFormData] = useState({
     company_name: '',
@@ -74,6 +79,18 @@ export default function Form() {
   const [showCompetitiveIntel, setShowCompetitiveIntel] = useState(false);
 
   useEffect(() => {
+    // Route protection: redirect to URLCapture if no data source
+    const urlParams = new URLSearchParams(window.location.search);
+    const resumeId = urlParams.get('resume');
+    const storedURL = localStorage.getItem('userWebsiteURL');
+    const savedDraft = localStorage.getItem('vox-launch-kit-draft');
+    const hasDataSource = resumeId || existingData || scanResults || isManualEntry || storedURL || savedDraft;
+
+    if (!hasDataSource) {
+      navigate('/URLCapture');
+      return;
+    }
+
     // Detect user location
     const detectUserLocation = async () => {
       try {
@@ -88,10 +105,6 @@ export default function Form() {
     };
     detectUserLocation();
 
-    // Check for resume link in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const resumeId = urlParams.get('resume');
-
     if (resumeId) {
       loadSavedProgress(resumeId);
     } else if (existingData) {
@@ -101,13 +114,59 @@ export default function Form() {
         setCustomCookies(existingData.cookie_level || 'analytics');
       }
     } else if (scanResults?.prefilled) {
-      setFormData(prev => ({
-        ...prev,
-        ...scanResults.prefilled
-      }));
+      // Enhanced auto-population from crawled data
+      const prefilled = scanResults.prefilled;
+      const filledFields = new Set();
+      const populatedData = { ...formData };
+
+      if (prefilled.company_name) {
+        populatedData.company_name = prefilled.company_name;
+        filledFields.add('company_name');
+      }
+      if (prefilled.product_description) {
+        populatedData.product_description = prefilled.product_description;
+        filledFields.add('product_description');
+      }
+      if (prefilled.contact_email) {
+        populatedData.contact_email = prefilled.contact_email;
+        filledFields.add('contact_email');
+      }
+      if (prefilled.country) {
+        populatedData.country = prefilled.country;
+        filledFields.add('country');
+      }
+      if (prefilled.services_used) {
+        populatedData.services_used = prefilled.services_used;
+        filledFields.add('services_used');
+      }
+      if (prefilled.cookie_level) {
+        populatedData.cookie_level = prefilled.cookie_level;
+        filledFields.add('cookie_level');
+      }
+
+      // Always set website_url from crawl
+      populatedData.website_url = websiteUrl || prefilled.url || '';
+
+      // Set preset based on detected services
+      const services = prefilled.thirdPartyServices || [];
+      if (services.some(s => s.includes('Shopify'))) {
+        populatedData.preset = 'ecommerce';
+      }
+
+      setFormData(populatedData);
+      setAutofilledFields(filledFields);
+
+      // Track auto-fill analytics
+      base44.analytics.track({
+        eventName: 'form_autofilled_from_crawl',
+        properties: {
+          fields_filled: filledFields.size,
+          fields: Array.from(filledFields),
+          url: websiteUrl,
+        }
+      });
     } else {
       // Check for saved draft in localStorage
-      const savedDraft = localStorage.getItem('vox-launch-kit-draft');
       if (savedDraft) {
         try {
           const draft = JSON.parse(savedDraft);
@@ -127,6 +186,41 @@ export default function Form() {
         }
       } else {
         handlePresetChange('standard');
+      }
+
+      // Also try loading from localStorage crawled data (for page refreshes)
+      const storedCrawlData = localStorage.getItem('crawledWebsiteData');
+      if (storedCrawlData && !savedDraft) {
+        try {
+          const crawled = JSON.parse(storedCrawlData);
+          if (crawled.prefilled) {
+            const prefilled = crawled.prefilled;
+            const filledFields = new Set();
+            const populatedData = { ...formData };
+
+            if (prefilled.company_name) {
+              populatedData.company_name = prefilled.company_name;
+              filledFields.add('company_name');
+            }
+            if (prefilled.product_description) {
+              populatedData.product_description = prefilled.product_description;
+              filledFields.add('product_description');
+            }
+            if (prefilled.contact_email) {
+              populatedData.contact_email = prefilled.contact_email;
+              filledFields.add('contact_email');
+            }
+            if (prefilled.country) {
+              populatedData.country = prefilled.country;
+              filledFields.add('country');
+            }
+            populatedData.website_url = storedURL || '';
+            setFormData(populatedData);
+            setAutofilledFields(filledFields);
+          }
+        } catch {
+          // Invalid stored data, ignore
+        }
       }
     }
   }, [scanResults, existingData]);
@@ -609,10 +703,10 @@ export default function Form() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12 pb-32 md:pb-12">
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/URLCapture')}
         className="text-zinc-400 hover:text-white mb-6 flex items-center text-sm"
       >
-        ← Back to start
+        ← Back to URL capture
       </button>
 
       <LegalBanner />
@@ -672,6 +766,13 @@ export default function Form() {
               Foundation questions. These populate your Privacy Policy, Terms, and About page.
             </p>
 
+            {autofilledFields.size > 0 && (
+              <div className="mb-4 flex items-center gap-2 text-xs text-[#C24516] bg-[#C24516]/5 border border-[#C24516]/20 rounded px-3 py-2">
+                <Check className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>{autofilledFields.size} field{autofilledFields.size !== 1 ? 's' : ''} pre-filled from your website</span>
+              </div>
+            )}
+
             {scanResults?.found && scanResults.found.length > 0 && (
               <details className="mb-6 group">
                 <summary className="cursor-pointer text-sm text-[rgba(250,247,242,0.7)] hover:text-[#faf7f2] transition-colors list-none flex items-center gap-2">
@@ -698,7 +799,12 @@ export default function Form() {
                 </div>
 
                 <div>
-                  <Label className="text-white mb-2 block text-base sm:text-sm">What should we call your product? *</Label>
+                  <Label className="text-white mb-2 block text-base sm:text-sm">
+                    What should we call your product? *
+                    {autofilledFields.has('company_name') && (
+                      <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                    )}
+                  </Label>
                   <Input
                     value={formData.company_name}
                     onChange={(e) => handleChange('company_name', e.target.value)}
@@ -708,7 +814,7 @@ export default function Form() {
                       setHighlightedField(null);
                     }}
                     className={`bg-zinc-900 border-zinc-800 text-white text-base h-12 sm:h-10 ${errors.company_name && touched.company_name ? 'border-red-500' : ''
-                      }`}
+                      } ${autofilledFields.has('company_name') ? 'border-[#C24516]/30' : ''}`}
                     placeholder="TaskFlow"
                   />
                   {errors.company_name && touched.company_name && (
@@ -717,7 +823,12 @@ export default function Form() {
                 </div>
 
                 <div>
-                  <Label className="text-white mb-2 block text-base sm:text-sm">Describe your product in one sentence *</Label>
+                  <Label className="text-white mb-2 block text-base sm:text-sm">
+                    Describe your product in one sentence *
+                    {autofilledFields.has('product_description') && (
+                      <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                    )}
+                  </Label>
                   <Textarea
                     value={formData.product_description}
                     onChange={(e) => handleChange('product_description', e.target.value)}
@@ -737,6 +848,15 @@ export default function Form() {
                     value={formData.product_description}
                     onSelect={(refinement) => handleChange('product_description', refinement)}
                     fieldName="product_description"
+                  />
+                  <AIRefineButton
+                    fieldName="product_description"
+                    currentValue={formData.product_description}
+                    context={{
+                      crawledData: scanResults?.prefilled,
+                      formData,
+                    }}
+                    onSelect={(refinedValue) => handleChange('product_description', refinedValue)}
                   />
                   <CharacterBudget value={formData.product_description} min={50} ideal={150} />
                 </div>
@@ -768,6 +888,7 @@ export default function Form() {
                     <CompetitiveIntelligence
                       formData={formData}
                       tier={isPremium ? 'premium' : 'free'}
+                      crawledWebsiteData={scanResults?.prefilled || null}
                       onComplete={(intel) => {
                         setCompetitiveIntel(intel);
                         setCurrentStep(2);
@@ -805,7 +926,12 @@ export default function Form() {
                   </div>
 
                   <div>
-                    <Label className="text-white mb-2 block text-base sm:text-sm">Where is your company based? *</Label>
+                    <Label className="text-white mb-2 block text-base sm:text-sm">
+                      Where is your company based? *
+                      {autofilledFields.has('country') && (
+                        <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                      )}
+                    </Label>
                     <Input
                       value={formData.country}
                       onChange={(e) => handleChange('country', e.target.value)}
@@ -881,7 +1007,12 @@ export default function Form() {
                   </div>
 
                   <div>
-                    <Label className="text-white mb-2 block text-base sm:text-sm">Where can users reach you? *</Label>
+                    <Label className="text-white mb-2 block text-base sm:text-sm">
+                      Where can users reach you? *
+                      {autofilledFields.has('contact_email') && (
+                        <span className="ml-2 text-xs text-[#C24516] font-normal">Auto-filled</span>
+                      )}
+                    </Label>
                     <Input
                       type="email"
                       value={formData.contact_email}
@@ -914,6 +1045,12 @@ export default function Form() {
                           placeholder="How do you want to be perceived? What makes you different from alternatives?"
                           rows={3}
                         />
+                        <AIRefineButton
+                          fieldName="brand_positioning"
+                          currentValue={formData.brand_positioning}
+                          context={{ crawledData: scanResults?.prefilled, formData }}
+                          onSelect={(v) => handleChange('brand_positioning', v)}
+                        />
                       </div>
 
                       <div>
@@ -935,6 +1072,12 @@ export default function Form() {
                           placeholder="What frustrates your users about current alternatives?"
                           rows={3}
                         />
+                        <AIRefineButton
+                          fieldName="target_pain_points"
+                          currentValue={formData.target_pain_points}
+                          context={{ crawledData: scanResults?.prefilled, formData }}
+                          onSelect={(v) => handleChange('target_pain_points', v)}
+                        />
                       </div>
 
                       <div>
@@ -945,6 +1088,12 @@ export default function Form() {
                           className="bg-zinc-900 border-zinc-800 text-white text-base min-h-[100px]"
                           placeholder="- Real-time collaboration&#10;- Built-in version control&#10;- API integrations"
                           rows={4}
+                        />
+                        <AIRefineButton
+                          fieldName="core_features"
+                          currentValue={formData.core_features}
+                          context={{ crawledData: scanResults?.prefilled, formData }}
+                          onSelect={(v) => handleChange('core_features', v)}
                         />
                       </div>
 
