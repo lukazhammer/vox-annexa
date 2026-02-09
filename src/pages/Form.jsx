@@ -789,9 +789,9 @@ export default function Form() {
 
       {/* Two-Pane Layout */}
       <div className="flex flex-col lg:grid lg:grid-cols-11 gap-6 sm:gap-8">
-        {/* LEFT PANE - Form */}
-        <div className="lg:col-span-5 order-1">
-          <div className="lg:sticky lg:top-6 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 sm:p-6 lg:max-w-[500px] max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--app-accent)] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:var(--app-accent)_transparent]">
+        {/* LEFT PANE - Form (wider to accommodate competitive analysis) */}
+        <div className="lg:col-span-6 order-1">
+          <div className="lg:sticky lg:top-6 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 sm:p-6 max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--app-accent)] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:var(--app-accent)_transparent]">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
               <h2 className="text-xl sm:text-2xl font-bold">Tell us about your product</h2>
               <div className="flex items-center gap-2">
@@ -1282,7 +1282,7 @@ export default function Form() {
         </div>
 
         {/* RIGHT PANE - Live Preview */}
-        <div className="lg:col-span-6 order-2">
+        <div className="lg:col-span-5 order-2">
           <LivePreview
             formData={formData}
             highlightedField={highlightedField}
