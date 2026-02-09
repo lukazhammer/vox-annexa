@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CompetitiveRadarChart } from '@/components/competitive/CompetitiveRadarChart';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, Download, Check, Lightbulb } from 'lucide-react';
 
 export default function CompetitiveResults() {
     const location = useLocation();
@@ -77,7 +77,7 @@ export default function CompetitiveResults() {
                         <div className="border-2 border-zinc-800 rounded-lg p-6 bg-zinc-900/30">
                             <h3 className="font-serif text-xl mb-4">Your Launch Kit</h3>
                             <p className="text-sm text-zinc-400 mb-4">
-                                {documents.length} documents generated
+                                {documents.length} documents created
                             </p>
 
                             <div className="space-y-2 mb-6">
@@ -101,13 +101,13 @@ export default function CompetitiveResults() {
                         {/* Intelligence Summary */}
                         <div className="border-2 border-[#C24516] rounded-lg p-6 bg-zinc-900/30">
                             <div className="flex items-center gap-2 mb-4">
-                                <Sparkles className="w-5 h-5 text-[#C24516]" />
+                                <Lightbulb className="w-5 h-5 text-[#C24516]" />
                                 <h3 className="font-serif text-xl text-[#C24516]">Intelligence Applied</h3>
                             </div>
 
                             <div className="space-y-4 text-sm">
                                 <div>
-                                    <div className="text-zinc-500 mb-1">Search terms generated:</div>
+                                    <div className="text-zinc-500 mb-1">Search terms created:</div>
                                     <div className="text-2xl font-bold text-zinc-100">
                                         {result.searchTerms?.length || 0}
                                     </div>
@@ -182,7 +182,7 @@ export default function CompetitiveResults() {
                             <div className="mt-6 p-4 bg-zinc-950 rounded-lg border border-zinc-800">
                                 <p className="text-sm text-zinc-400">
                                     <strong className="text-zinc-100">How to use this chart:</strong>{' '}
-                                    The radar chart shows your competitive position across AI-generated
+                                    The radar chart shows your competitive position across AI-assisted
                                     market dimensions. Add differentiators to see how your positioning
                                     shifts. Larger coverage = stronger position in that dimension.
                                 </p>

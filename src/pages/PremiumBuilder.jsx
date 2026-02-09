@@ -80,12 +80,12 @@ export default function PremiumBuilder() {
       });
       if (response.data) {
         base44.analytics.track({
-          eventName: 'premium_documents_regenerated',
+          eventName: 'premium_documents_refreshed',
           properties: { source: 'premium_builder' }
         });
       }
     } catch (err) {
-      console.error('Regeneration failed:', err);
+      console.error('Refresh failed:', err);
     } finally {
       setIsRegenerating(false);
     }
@@ -268,10 +268,10 @@ function BuildTab({ formData, onFieldChange, radarData, onRegenerate, isRegenera
               {isRegenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Regenerating...
+                  Refreshing...
                 </>
               ) : (
-                'Regenerate Documents'
+                'Refresh Documents'
               )}
             </Button>
           </div>
@@ -334,7 +334,7 @@ function BuildTab({ formData, onFieldChange, radarData, onRegenerate, isRegenera
             <TrendingUp className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
             <p className="text-zinc-400 mb-4">No competitive analysis yet</p>
             <p className="text-zinc-500 text-sm">
-              Switch to the Competitive Analysis tab to analyze competitors and generate your positioning map.
+              Switch to the Competitive Analysis tab to analyze competitors and create your positioning map.
             </p>
           </div>
         )}
@@ -453,9 +453,9 @@ function DocumentsTab({ formData: _formData }) {
     return (
       <div className="text-center py-12">
         <Download className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-        <p className="text-zinc-400 mb-2">No documents generated yet</p>
+        <p className="text-zinc-400 mb-2">No documents created yet</p>
         <p className="text-zinc-500 text-sm">
-          Go to the Build & Refine tab to generate your documents.
+          Go to the Build & Refine tab to create your documents.
         </p>
       </div>
     );
@@ -486,7 +486,7 @@ function DocumentsTab({ formData: _formData }) {
               <div className="text-2xl mb-3">{doc.icon}</div>
               <h3 className="font-medium text-[#faf7f2] mb-1">{doc.label}</h3>
               <p className="text-xs text-zinc-500">
-                {content ? `${(content.length / 1024).toFixed(1)}KB` : 'Not generated'}
+                {content ? `${(content.length / 1024).toFixed(1)}KB` : 'Not created'}
               </p>
               {content && (
                 <Button

@@ -79,7 +79,7 @@ export default function UpsellModal({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      setDownloadError('Failed to generate PDF. Please try again.');
+      setDownloadError('Failed to create PDF. Please try again.');
     } finally {
       setDownloading(false);
     }
@@ -114,7 +114,7 @@ export default function UpsellModal({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      setDownloadError('Failed to generate zip. Please try again.');
+      setDownloadError('Failed to create ZIP. Please try again.');
     } finally {
       setDownloading(false);
     }
@@ -134,7 +134,7 @@ export default function UpsellModal({
           <div className="space-y-4">
             {/* Document list */}
             <div className="space-y-2">
-              <p className="text-zinc-300">11 documents generated:</p>
+              <p className="text-zinc-300">11 documents created:</p>
               <div className="text-sm text-zinc-400 grid grid-cols-2 gap-1">
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -255,7 +255,7 @@ export default function UpsellModal({
                 className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12"
               >
                 {downloading ? (
-                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Generating...</>
+                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Preparing...</>
                 ) : (
                   <><Download className="w-5 h-5 mr-2" />Download All (ZIP)</>
                 )}
@@ -326,7 +326,7 @@ export default function UpsellModal({
 
         <div className="space-y-6">
           <div className="space-y-2">
-            <p className="text-zinc-300">4 templates generated:</p>
+            <p className="text-zinc-300">4 templates created:</p>
             <div className="text-sm text-zinc-400 space-y-1">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-500" />
@@ -359,7 +359,7 @@ export default function UpsellModal({
             className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12"
           >
             {downloading ? (
-              <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Generating...</>
+              <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Preparing...</>
             ) : (
               <><Download className="w-4 h-4 mr-2" />Download launch kit</>
             )}
@@ -414,3 +414,4 @@ export default function UpsellModal({
     </Dialog>
   );
 }
+

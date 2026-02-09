@@ -38,7 +38,7 @@ export default function AIRefiner({ value, onSelect, fieldName }) {
     try {
       const prompt = `You are a business writing expert. The user wrote: "${value}"
 
-Generate three distinct improvements of this text:
+Create three distinct improvements of this text:
 1. CONCISE: Make it shorter and punchier (1 sentence max)
 2. PROFESSIONAL: Make it more formal and polished
 3. STRATEGIC: Make it more compelling and value-focused
@@ -74,11 +74,11 @@ Return ONLY valid JSON with this exact structure:
       setLastProcessed(value.trim());
       
       base44.analytics.track({
-        eventName: 'ai_refinement_generated',
+        eventName: 'ai_refinement_created',
         properties: { field: fieldName }
       });
     } catch (error) {
-      console.error('Failed to generate refinements:', error);
+      console.error('Failed to create refinements:', error);
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,7 @@ Return ONLY valid JSON with this exact structure:
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Generating refinements...</span>
+              <span>Preparing refinements...</span>
             </>
           ) : (
            <>

@@ -19,7 +19,7 @@ export default function AnnexaPrivacy() {
 
         <h2>What This Tool Does</h2>
         <p>
-          Annexa (provided by Vox Animus OÜ) is a free tool that helps you generate legal document templates for your SaaS product. You fill out a form, we generate documents. That's it.
+          Annexa (provided by Vox Animus OÜ) is a free tool that helps you create legal document templates for your SaaS product. You fill out a form, we prepare drafts. That's it.
         </p>
 
         <h2>What We Collect</h2>
@@ -45,7 +45,7 @@ export default function AnnexaPrivacy() {
 
         <h2>What We DON'T Collect</h2>
         <ul>
-          <li>We don't store your generated documents</li>
+          <li>We don't store your created documents</li>
           <li>We don't sell your information</li>
           <li>We don't track you across other sites</li>
           <li>We don't use advertising cookies</li>
@@ -55,8 +55,8 @@ export default function AnnexaPrivacy() {
 
         <h3>Free Tier:</h3>
         <ul>
-          <li>Generate document templates (client-side processing)</li>
-          <li>Rate limiting (10 generations per IP per day)</li>
+          <li>Create document templates (client-side processing)</li>
+          <li>Rate limiting (10 creation requests per IP per day)</li>
           <li>Anonymous analytics (page views, completion rates)</li>
         </ul>
 
@@ -79,7 +79,7 @@ export default function AnnexaPrivacy() {
 
         <h3>EDGE Tier:</h3>
         <ul>
-          <li>Generated documents stored for 30 days (for re-download)</li>
+          <li>created documents stored for 30 days (for re-download)</li>
           <li>Payment information stored by Stripe (not by us)</li>
           <li>Email address stored for delivery and support</li>
         </ul>
@@ -156,3 +156,4 @@ export default function AnnexaPrivacy() {
     </div>
   );
 }
+

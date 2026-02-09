@@ -11,7 +11,7 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'competitive_in
       description: 'See where you stand vs competitors with interactive radar charts',
       features: [
         'Real-time competitor website crawling',
-        'AI-generated market dimensions (6-8 axes)',
+        'AI-assisted market dimensions (6-8 axes)',
         'Percentile scoring (0-100 scale)',
         'Interactive chart updates',
         'Export as PNG/PDF',

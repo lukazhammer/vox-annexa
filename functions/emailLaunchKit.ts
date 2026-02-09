@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       subject: `Your Annexa Documents Are Ready`,
       body: `Hi there,
 
-Your documents have been generated and are ready to download.
+Your documents are ready to download.
 
 What's included:
 - Privacy Policy

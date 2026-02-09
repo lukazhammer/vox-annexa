@@ -79,7 +79,7 @@ export function CompetitiveRadarChart({ userProduct, competitor, onDifferentiato
             });
 
             if (axesResult.data.error) {
-                throw new Error(axesResult.data.message || 'Failed to generate axes');
+                throw new Error(axesResult.data.message || 'Failed to create axes');
             }
 
             generatedAxes = axesResult.data.axes;
@@ -292,7 +292,7 @@ export function CompetitiveRadarChart({ userProduct, competitor, onDifferentiato
                 <div className="text-center">
                     <Loader2 className="w-8 h-8 animate-spin text-[#C24516] mx-auto mb-4" />
                     <p className="text-zinc-400">Analyzing competitive positioning...</p>
-                    <p className="text-zinc-500 text-sm mt-1">Generating market dimensions</p>
+                    <p className="text-zinc-500 text-sm mt-1">Creating market dimensions</p>
                 </div>
             </div>
         );
@@ -302,7 +302,7 @@ export function CompetitiveRadarChart({ userProduct, competitor, onDifferentiato
     if (error) {
         return (
             <div className="bg-zinc-950 border border-red-500/30 rounded-lg p-6 text-center">
-                <p className="text-red-400 mb-2">Failed to generate competitive analysis</p>
+                <p className="text-red-400 mb-2">Failed to create competitive analysis</p>
                 <p className="text-zinc-500 text-sm">{error}</p>
                 <button
                     onClick={generateAxes}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Lightbulb, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 const REFINEMENT_TYPES = [
@@ -44,7 +44,7 @@ export default function AIRefineButton({
       setSuggestions(data);
 
       base44.analytics.track({
-        eventName: 'ai_refine_generated',
+        eventName: 'ai_refine_created',
         properties: { field: fieldName, type }
       });
     } catch (err) {
@@ -76,7 +76,7 @@ export default function AIRefineButton({
             disabled={isRefining || !currentValue?.trim()}
             className="text-xs px-2.5 py-1 border border-[#C24516]/40 text-[#C24516] rounded hover:bg-[#C24516] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
           >
-            <Sparkles className="w-3 h-3" />
+            <Lightbulb className="w-3 h-3" />
             {type.label}
           </button>
         ))}

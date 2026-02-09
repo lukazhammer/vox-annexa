@@ -201,7 +201,7 @@ export default function Home() {
                   { icon: '✓', title: 'Everything in Free', desc: 'All legal docs included' },
                   { icon: '★', title: 'Competitive radar chart', desc: 'Visual positioning analysis' },
                   { icon: '★', title: 'Real-time competitor crawl', desc: 'Extract positioning automatically' },
-                  { icon: '★', title: 'AI-generated dimensions', desc: '6-8 market-specific axes' },
+                  { icon: '★', title: 'AI-assisted dimensions', desc: '6-8 market-specific axes' },
                   { icon: '★', title: 'Percentile scoring', desc: 'You vs competitor (0-100 scale)' },
                   { icon: '★', title: 'Interactive updates', desc: 'Add differentiators, watch chart update' },
                   { icon: '★', title: 'Export radar as PNG/PDF', desc: 'Share with investors, team' },
@@ -266,7 +266,7 @@ export default function Home() {
             <div className="flex gap-6">
               <div className="mono-accent text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12">02</div>
               <div className="flex-1">
-                <h3 className="text-2xl mb-3 text-[#faf7f2]">AI generates competitive dimensions</h3>
+                <h3 className="text-2xl mb-3 text-[#faf7f2]">AI creates competitive dimensions</h3>
                 <p className="text-[rgba(250,247,242,0.6)] mb-4">
                   Based on industry, Gemini creates 6-8 market-specific axes.
                   Not generic. Tailored to SaaS, e-commerce, or your vertical.

@@ -22,7 +22,7 @@ export default function LegalBanner() {
     <div className="bg-transparent border-b border-[rgba(250,247,242,0.1)] py-2 px-0 mb-4 relative">
       <div className="flex items-center justify-between">
         <p className="text-xs text-[rgba(250,247,242,0.5)]">
-          Generated templates should be reviewed by legal counsel.{' '}
+          Created templates should be reviewed by legal counsel.{' '}
           <a
             href="/annexaterms"
             target="_blank"

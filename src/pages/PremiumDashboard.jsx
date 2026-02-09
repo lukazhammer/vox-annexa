@@ -189,7 +189,7 @@ export default function PremiumDashboard() {
           </p>
           {retryCount > 0 && (
             <p className="text-sm text-zinc-500 mt-2">
-              Still generating... (attempt {retryCount + 1}/{maxRetries + 1})
+              Still creating... (attempt {retryCount + 1}/{maxRetries + 1})
             </p>
           )}
           <p className="text-sm text-zinc-600 mt-2">This should only take a moment.</p>
@@ -210,7 +210,7 @@ export default function PremiumDashboard() {
           <p className="text-zinc-400 mb-6">{error}</p>
           <p className="text-sm text-zinc-500 mb-6">
             Your payment was successful and you now have Premium access.
-            The competitive analysis may still be generating.
+            The competitive analysis may still be creating.
           </p>
           <div className="flex flex-col gap-3">
             <button
@@ -289,7 +289,7 @@ export default function PremiumDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
             icon={<CheckCircle className="w-5 h-5" />}
-            label="Documents Generated"
+            label="Documents Created"
             value={storedDocuments ? Object.keys(storedDocuments.documents || {}).length.toString() : '11'}
             color="green"
           />
@@ -432,7 +432,7 @@ function OverviewTab({ radarData, companyName, storedFormData, onTabChange }) {
         </h2>
         <p className="text-zinc-400 text-lg mb-6 font-sans">
           Complete competitive analysis for {companyName}.
-          All documents generated. Ready to implement.
+          All documents created. Ready to implement.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -664,7 +664,7 @@ function CompetitiveTab({ radarData, companyName, onExport }) {
       {/* Metadata */}
       <div className="text-center">
         <p className="text-sm text-zinc-600 font-sans">
-          Analysis generated{' '}
+          Analysis created{' '}
           {radarData.generatedAt
             ? new Date(radarData.generatedAt).toLocaleString()
             : 'recently'}
@@ -727,17 +727,17 @@ function DocumentsTab({
       <div className="text-center py-16">
         <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
         <h3 className="font-serif text-2xl text-zinc-200 mb-3">
-          Documents Not Generated Yet
+          Documents Not Created Yet
         </h3>
         <p className="text-zinc-400 font-sans mb-6 max-w-md mx-auto">
-          Complete the form to generate your premium documents. As a premium
+          Complete the form to create your premium documents. As a premium
           member, you get all 11 documents with AI enhancement.
         </p>
         <button
           onClick={onGenerateDocuments}
           className="flex items-center gap-2 px-6 py-3 bg-[#C24516] text-white rounded-lg hover:bg-[#A03814] transition-colors font-sans mx-auto"
         >
-          Generate Documents
+          Create Documents
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
@@ -768,7 +768,7 @@ function DocumentsTab({
                 {doc.name}
               </h3>
               <p className="text-sm text-zinc-500 font-sans">
-                {doc.words > 0 ? `${doc.words} words` : 'Ready to generate'}
+                {doc.words > 0 ? `${doc.words} words` : 'Ready to create'}
               </p>
             </div>
 
@@ -971,7 +971,7 @@ function generateImplementationPrompt(
   const docs = storedDocuments?.documents || {};
   const socialBios = storedDocuments?.socialBios;
 
-  let prompt = `# Implement Annexa Generated Documents
+  let prompt = `# Implement Annexa Created Documents
 
 ## Business Details
 - Name: ${companyName}
@@ -1042,3 +1042,4 @@ Use the brand guidelines and competitive positioning to inform all copy.
 
   return prompt;
 }
+
