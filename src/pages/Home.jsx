@@ -1,166 +1,408 @@
-import React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowDown, ScanLine, FileText, Check } from 'lucide-react';
 
 export default function Home() {
   const navigate = useNavigate();
+  const [url, setUrl] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
+  const [bottomUrl, setBottomUrl] = useState('');
 
-  const handleScan = () => {
-    navigate('/URLCapture');
+  const handleStart = async (inputUrl) => {
+    const target = inputUrl || url;
+    if (!target) {
+      navigate('/URLCapture');
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      const normalized = target.startsWith('http') ? target : `https://${target}`;
+      new URL(normalized);
+      localStorage.setItem('userWebsiteURL', normalized);
+      navigate('/URLCapture', { state: { prefillUrl: normalized } });
+    } catch {
+      navigate('/URLCapture');
+    } finally {
+      setIsValidating(false);
+    }
   };
 
-  const handleManual = () => {
-    navigate('/URLCapture');
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') handleStart();
   };
 
   return (
-      <div className="py-20">
-        <div className="max-w-[1200px] mx-auto px-6">
-          {/* Hero Section */}
-          <div className="text-center mb-[180px] max-w-[900px] mx-auto">
-            <h2 className="text-[64px] md:text-[56px] sm:text-[36px] font-bold mb-10 text-[#faf7f2] leading-tight">
-              Legal foundation. Built in 5 minutes.
-            </h2>
-            <p className="text-[20px] md:text-xl sm:text-lg text-[rgba(250,247,242,0.8)] leading-relaxed">
-              Privacy Policy, Terms, Cookie Policy, and support docs for your SaaS. GDPR and CCPA ready.
-            </p>
-          </div>
+    <div>
+      {/* Hero Section */}
+      <section className="min-h-[85vh] flex items-center justify-center px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Headline */}
+          <h2 className="text-[56px] md:text-[48px] sm:text-[36px] leading-tight mb-6 text-[#faf7f2]">
+            Legal docs that help you win.
+            <br />
+            Not just comply.
+          </h2>
 
-          {/* What You'll Get Section */}
-          <div className="mb-[140px] md:mb-[140px] sm:mb-[100px] max-w-[700px] mx-auto">
-          <h3 className="text-[32px] md:text-[28px] sm:text-[24px] font-bold mb-10 text-[#faf7f2]">
-            What you'll get
-          </h3>
-          
-          {/* Legal Foundation */}
-          <div className="mb-8">
-            <p className="text-[13px] font-semibold text-[rgba(250,247,242,0.5)] mb-4 uppercase tracking-wider">Legal Foundation</p>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-[#faf7f2] text-lg">
-                <Check className="w-5 h-5 text-[#C24516] flex-shrink-0" />
-                <span>Privacy Policy <span className="text-[rgba(250,247,242,0.5)] text-base">(GDPR + CCPA)</span></span>
-              </div>
-              <div className="flex items-center gap-3 text-[#faf7f2] text-lg">
-                <Check className="w-5 h-5 text-[#C24516] flex-shrink-0" />
-                <span>Terms of Service</span>
-              </div>
-              <div className="flex items-center gap-3 text-[#faf7f2] text-lg">
-                <Check className="w-5 h-5 text-[#C24516] flex-shrink-0" />
-                <span>Cookie Policy</span>
-              </div>
-              <div className="flex items-center gap-3 text-[#faf7f2] text-lg">
-                <Check className="w-5 h-5 text-[#C24516] flex-shrink-0" />
-                <span>About Us Page</span>
-              </div>
-            </div>
-          </div>
+          {/* Value Prop */}
+          <p className="text-xl text-[rgba(250,247,242,0.7)] mb-4 max-w-3xl mx-auto">
+            GDPR compliance plus competitive intelligence.
+            See where you stand. Find positioning gaps. Win customers.
+          </p>
 
-          {/* Search & AI Visibility */}
-          <div className="pt-8 border-t border-[rgba(250,247,242,0.1)]">
-            <p className="text-[13px] font-semibold text-[rgba(250,247,242,0.5)] mb-4 uppercase tracking-wider">Search & AI Visibility</p>
-            <div className="space-y-2.5">
-              <div className="flex items-start gap-3 text-[rgba(250,247,242,0.7)]">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <div className="text-base">
-                  <span className="text-[#faf7f2]">robots.txt</span>
-                  <span className="text-[rgba(250,247,242,0.5)]"> — Search engine instructions</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 text-[rgba(250,247,242,0.7)]">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <div className="text-base">
-                  <span className="text-[#faf7f2]">llms.txt</span>
-                  <span className="text-[rgba(250,247,242,0.5)]"> — AI assistant guidelines</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 text-[rgba(250,247,242,0.7)]">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <div className="text-base">
-                  <span className="text-[#faf7f2]">sitemap.xml</span>
-                  <span className="text-[rgba(250,247,242,0.5)]"> — Site structure for indexing</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 text-[rgba(250,247,242,0.7)]">
-                <Check className="w-4 h-4 text-[#C24516] flex-shrink-0 mt-0.5" />
-                <div className="text-base">
-                  <span className="text-[#faf7f2]">Brand JSON-LD</span>
-                  <span className="text-[rgba(250,247,242,0.5)]"> — Rich search results</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          {/* Trust Line */}
+          <p className="text-base text-[rgba(250,247,242,0.5)] mb-12">
+            Free legal docs. $29 for competitive radar. No subscription.
+          </p>
 
-          {/* Path Cards */}
-          <div className="grid md:grid-cols-2 gap-6 mb-[180px] md:mb-[180px] sm:mb-[130px] max-w-[1000px] mx-auto">
-          {/* Primary: Start from Scratch */}
-          <button
-            onClick={handleManual}
-            className="group bg-[#2a2a2c] border border-[rgba(194,69,22,0.2)] rounded-lg p-8 text-left hover:border-[#C24516] hover:scale-[1.02] transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-[#C24516] focus:ring-offset-2 focus:ring-offset-[#09090B] flex flex-col h-full min-h-[280px]"
-          >
-            <FileText className="w-8 h-8 text-[#C24516] mb-4" />
-            <h3 className="text-2xl md:text-2xl sm:text-xl font-bold mb-3 text-[#faf7f2]">Start from Scratch</h3>
-            <p className="text-[rgba(250,247,242,0.7)] mb-6 flex-grow leading-relaxed">
-              No site yet? Fill out the form and build documents manually.
-            </p>
-            <div className="mt-auto">
-              <Button 
-                className="w-full bg-[#C24516] hover:bg-[#a33912] hover:scale-[1.02] active:scale-[0.98] text-white h-12 transition-all duration-150 ease-out"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleManual();
-                }}
-              >
-                Fill out the form <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform duration-150" />
-              </Button>
-            </div>
-          </button>
-
-          {/* Secondary: Scan Existing Site */}
-          <button
-            onClick={handleScan}
-            className="group bg-[#242426] border border-[rgba(250,247,242,0.12)] rounded-lg p-8 text-left hover:border-[#C24516] hover:scale-[1.02] transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-[#C24516] focus:ring-offset-2 focus:ring-offset-[#09090B] flex flex-col h-full min-h-[280px]"
-          >
-            <ScanLine className="w-8 h-8 text-[#C24516] mb-4" />
-            <h3 className="text-2xl md:text-2xl sm:text-xl font-bold mb-3 text-[#faf7f2]">Scan Existing Site</h3>
-            <p className="text-[rgba(250,247,242,0.7)] mb-6 flex-grow leading-relaxed">
-              Already have a site? We'll analyze it and pre-fill everything we detect.
-            </p>
-            <div className="mt-auto">
+          {/* Primary CTA */}
+          <div className="max-w-2xl mx-auto mb-16">
+            <div className="flex gap-3 mb-4">
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="https://your-website.com"
+                className="flex-1 px-6 py-4 text-lg border-2 border-[rgba(250,247,242,0.15)] rounded-lg bg-[#09090B] text-[#faf7f2] focus:border-[#C24516] focus:outline-none transition-colors placeholder:text-[rgba(250,247,242,0.3)]"
+              />
               <button
-                className="w-full bg-transparent border border-[#C24516] text-[#faf7f2] hover:bg-[#C24516]/10 h-12 rounded-md flex items-center justify-center gap-2 transition-all duration-150 ease-out"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleScan();
-                }}
+                onClick={() => handleStart()}
+                disabled={isValidating}
+                className="px-8 py-4 bg-[#C24516] text-white rounded-lg text-lg font-medium hover:bg-[#A03814] disabled:opacity-50 transition-colors whitespace-nowrap"
               >
-                Drop your URL <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform duration-150" />
+                {isValidating ? 'Validating...' : 'Start free'}
               </button>
             </div>
-          </button>
-        </div>
 
-          {/* Cross-sell Section */}
-          <div className="bg-[#1a1a1c] pt-[80px] pb-[80px] px-8 text-center border-t border-t-[rgba(250,247,242,0.12)]">
-            <div className="max-w-[800px] mx-auto">
-              <h3 className="text-2xl md:text-2xl sm:text-xl font-semibold mb-6 text-[#faf7f2]">
-                Built with Annexa. Now make it distinctive.
-              </h3>
-              <p className="text-[18px] text-[rgba(250,247,242,0.7)] leading-relaxed mb-6">
-                Most SaaS products look identical because AI tools use the same templates. Vox Animus structures your brand intent into enforceable prompts for Bolt, Cursor, and Lovable.
-              </p>
-              <a 
-                href="https://vox-animus.com/demo" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[#C24516] hover:brightness-110 hover:underline transition-all duration-150"
+            <p className="text-sm text-[rgba(250,247,242,0.4)]">
+              Preview everything free. No credit card required.
+            </p>
+          </div>
+
+          {/* Visual Proof: Radar Chart Teaser */}
+          <div className="relative max-w-3xl mx-auto">
+            <div className="relative rounded-xl overflow-hidden border-2 border-[rgba(194,69,22,0.2)]">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-transparent z-10 pointer-events-none"></div>
+
+              {/* Mock radar chart SVG */}
+              <svg viewBox="0 0 400 300" className="w-full h-auto blur-[3px] opacity-40">
+                <defs>
+                  <radialGradient id="radarGrad">
+                    <stop offset="0%" stopColor="#C24516" stopOpacity="0.3"/>
+                    <stop offset="100%" stopColor="#C24516" stopOpacity="0"/>
+                  </radialGradient>
+                </defs>
+                <circle cx="200" cy="150" r="30" fill="none" stroke="#faf7f2" strokeOpacity="0.1"/>
+                <circle cx="200" cy="150" r="60" fill="none" stroke="#faf7f2" strokeOpacity="0.1"/>
+                <circle cx="200" cy="150" r="90" fill="none" stroke="#faf7f2" strokeOpacity="0.1"/>
+                <circle cx="200" cy="150" r="120" fill="none" stroke="#faf7f2" strokeOpacity="0.1"/>
+                <line x1="200" y1="150" x2="200" y2="30" stroke="#faf7f2" strokeOpacity="0.2"/>
+                <line x1="200" y1="150" x2="304" y2="90" stroke="#faf7f2" strokeOpacity="0.2"/>
+                <line x1="200" y1="150" x2="304" y2="210" stroke="#faf7f2" strokeOpacity="0.2"/>
+                <line x1="200" y1="150" x2="200" y2="270" stroke="#faf7f2" strokeOpacity="0.2"/>
+                <line x1="200" y1="150" x2="96" y2="210" stroke="#faf7f2" strokeOpacity="0.2"/>
+                <line x1="200" y1="150" x2="96" y2="90" stroke="#faf7f2" strokeOpacity="0.2"/>
+                <polygon points="200,60 270,100 280,200 200,240 120,200 130,100" fill="url(#radarGrad)" stroke="#C24516" strokeWidth="2" opacity="0.6"/>
+                <polygon points="200,80 250,110 260,190 200,220 140,190 150,110" fill="none" stroke="#666" strokeWidth="2" strokeDasharray="4"/>
+              </svg>
+
+              {/* Overlay card */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-[#09090B]/95 backdrop-blur-sm border-2 border-[#C24516] rounded-xl px-8 py-6 max-w-md mx-4 shadow-2xl">
+                  <h3 className="text-2xl mb-3 text-[#faf7f2]">
+                    See where you stand
+                  </h3>
+                  <p className="text-[rgba(250,247,242,0.6)] mb-6">
+                    Competitive radar shows positioning across 6-8 market dimensions.
+                    You vs competitors. Real percentile scores.
+                  </p>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#C24516]"></div>
+                      <span className="text-[rgba(250,247,242,0.5)]">You</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full border-2 border-[rgba(250,247,242,0.4)]"></div>
+                      <span className="text-[rgba(250,247,242,0.5)]">Competitor</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-sm text-[rgba(250,247,242,0.4)] mt-4">
+              Included with Premium ($29)
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Free vs Premium */}
+      <section className="py-24 bg-[#1a1a1c]">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl text-center mb-16 text-[#faf7f2]">
+            What you get
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Tier */}
+            <div className="border-2 border-[rgba(250,247,242,0.12)] rounded-xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl text-[#faf7f2]">Free</h3>
+                <span className="text-2xl font-bold text-[#faf7f2]">$0</span>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                {[
+                  { title: 'Privacy Policy', desc: 'GDPR + CCPA compliant' },
+                  { title: 'Terms of Service', desc: 'Enforceable, jurisdiction-aware' },
+                  { title: 'Cookie Policy', desc: 'Matches your actual cookies' },
+                  { title: 'About Us page', desc: 'Professional, not generic' },
+                  { title: 'SEO files', desc: 'robots.txt, sitemap.xml, llms.txt' },
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="text-[#C24516] text-xl flex-shrink-0">&#10003;</span>
+                    <div>
+                      <div className="font-medium text-[#faf7f2]">{item.title}</div>
+                      <div className="text-sm text-[rgba(250,247,242,0.5)]">{item.desc}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => navigate('/URLCapture')}
+                className="w-full border-2 border-[#C24516] text-[#C24516] px-6 py-3 rounded-lg font-medium hover:bg-[#C24516]/5 transition-colors"
               >
-                See how it works <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </a>
+                Start free
+              </button>
+
+              <p className="text-xs text-[rgba(250,247,242,0.4)] text-center mt-4">
+                Login required to download (abuse prevention)
+              </p>
+            </div>
+
+            {/* Premium Tier */}
+            <div className="border-2 border-[#C24516] rounded-xl p-8 relative bg-[#C24516]/5">
+              <div className="absolute -top-3 left-8 bg-[#C24516] text-white text-xs font-medium px-3 py-1 rounded">
+                Most builders choose this
+              </div>
+
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl text-[#faf7f2]">Premium</h3>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-[#faf7f2]">$29</div>
+                  <div className="text-xs text-[rgba(250,247,242,0.5)]">one-time</div>
+                </div>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                {[
+                  { icon: '✓', title: 'Everything in Free', desc: 'All legal docs included' },
+                  { icon: '★', title: 'Competitive radar chart', desc: 'Visual positioning analysis' },
+                  { icon: '★', title: 'Real-time competitor crawl', desc: 'Extract positioning automatically' },
+                  { icon: '★', title: 'AI-generated dimensions', desc: '6-8 market-specific axes' },
+                  { icon: '★', title: 'Percentile scoring', desc: 'You vs competitor (0-100 scale)' },
+                  { icon: '★', title: 'Interactive updates', desc: 'Add differentiators, watch chart update' },
+                  { icon: '★', title: 'Export radar as PNG/PDF', desc: 'Share with investors, team' },
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="text-[#C24516] text-xl flex-shrink-0">{item.icon}</span>
+                    <div>
+                      <div className="font-medium text-[#faf7f2]">{item.title}</div>
+                      <div className="text-sm text-[rgba(250,247,242,0.5)]">{item.desc}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => navigate('/URLCapture', { state: { premium: true } })}
+                className="w-full bg-[#C24516] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#A03814] transition-colors"
+              >
+                Start with Premium
+              </button>
+
+              <p className="text-xs text-center mt-4 text-[#C24516]">
+                VIP access to competitive intelligence
+              </p>
             </div>
           </div>
         </div>
-      </div>
-    );
+      </section>
+
+      {/* How Competitive Intelligence Works */}
+      <section className="py-24">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-4xl text-center mb-4 text-[#faf7f2]">
+            How competitive intelligence works
+          </h2>
+          <p className="text-center text-[rgba(250,247,242,0.6)] mb-16 max-w-2xl mx-auto">
+            Premium gives you strategic positioning analysis.
+            See exactly where you win and where competitors have an edge.
+          </p>
+
+          <div className="space-y-16">
+            {/* Step 1 */}
+            <div className="flex gap-6">
+              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>01</div>
+              <div className="flex-1">
+                <h3 className="text-2xl mb-3 text-[#faf7f2]">Paste competitor URL</h3>
+                <p className="text-[rgba(250,247,242,0.6)] mb-4">
+                  We crawl their website. Extract messaging, positioning, features, pricing strategy.
+                  Takes 10-20 seconds depending on site size.
+                </p>
+                <div className="bg-[#1a1a1c] border border-[rgba(250,247,242,0.1)] rounded-lg p-4 text-sm" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[rgba(250,247,242,0.4)]">$</span>
+                    <span className="text-[#faf7f2]">crawl https://asana.com</span>
+                  </div>
+                  <div className="text-[#C24516] mt-2">&#8594; Analyzing... Extracted positioning</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex gap-6">
+              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>02</div>
+              <div className="flex-1">
+                <h3 className="text-2xl mb-3 text-[#faf7f2]">AI generates competitive dimensions</h3>
+                <p className="text-[rgba(250,247,242,0.6)] mb-4">
+                  Based on industry, Gemini creates 6-8 market-specific axes.
+                  Not generic. Tailored to SaaS, e-commerce, or your vertical.
+                </p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {[
+                    'Ease of Use',
+                    'Feature Depth',
+                    'Price Positioning',
+                    'Customization',
+                    'Onboarding Speed',
+                    'Enterprise Ready',
+                    'Design Quality',
+                    'Performance'
+                  ].map((axis, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-[#1a1a1c] rounded px-3 py-2">
+                      <span className="text-[#C24516]">&#8594;</span>
+                      <span className="text-[#faf7f2]">{axis}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex gap-6">
+              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>03</div>
+              <div className="flex-1">
+                <h3 className="text-2xl mb-3 text-[#faf7f2]">See positioning gaps</h3>
+                <p className="text-[rgba(250,247,242,0.6)] mb-4">
+                  Radar chart scores both products (0-100 percentile).
+                  Larger area = stronger positioning. Gaps = opportunities.
+                </p>
+                <div className="bg-[#1a1a1c] border border-[rgba(250,247,242,0.1)] rounded-lg p-6">
+                  <div className="flex items-center justify-center gap-8 text-sm mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-[#C24516]"></div>
+                      <span className="text-[#faf7f2]">Your Product</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full border-2 border-[rgba(250,247,242,0.4)]"></div>
+                      <span className="text-[#faf7f2]">Competitor</span>
+                    </div>
+                  </div>
+                  <div className="aspect-square max-w-sm mx-auto bg-[#09090B] rounded-lg flex items-center justify-center text-[rgba(250,247,242,0.3)]">
+                    [Interactive chart renders here]
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="flex gap-6">
+              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>04</div>
+              <div className="flex-1">
+                <h3 className="text-2xl mb-3 text-[#faf7f2]">Add differentiators, watch updates</h3>
+                <p className="text-[rgba(250,247,242,0.6)] mb-4">
+                  Tell us how you're different. Chart updates in real-time.
+                  Export as PNG/PDF when done.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 bg-[#1a1a1c] rounded-lg p-3 text-sm">
+                    <span className="text-[#C24516]">+</span>
+                    <span className="text-[#faf7f2]">10x faster onboarding than Asana</span>
+                    <span className="ml-auto text-xs text-[#C24516]">Chart updated</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-[#1a1a1c] rounded-lg p-3 text-sm">
+                    <span className="text-[#C24516]">+</span>
+                    <span className="text-[#faf7f2]">Built for solo devs, not enterprises</span>
+                    <span className="ml-auto text-xs text-[#C24516]">Chart updated</span>
+                  </div>
+                  <div className="w-full border-2 border-dashed border-[rgba(250,247,242,0.12)] rounded-lg p-3 text-sm text-[rgba(250,247,242,0.4)]">
+                    + Add another differentiator
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 bg-[#C24516] text-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-4xl mb-6">
+            Legal docs that help you win
+          </h2>
+          <p className="text-xl mb-12 opacity-90">
+            Compliance plus competitive intelligence. All for $29.
+          </p>
+
+          <div className="max-w-2xl mx-auto">
+            <div className="flex gap-3 mb-4">
+              <input
+                type="url"
+                value={bottomUrl}
+                onChange={(e) => setBottomUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleStart(bottomUrl);
+                }}
+                placeholder="https://your-website.com"
+                className="flex-1 px-6 py-4 rounded-lg text-gray-900 text-lg placeholder:text-gray-400"
+              />
+              <button
+                onClick={() => handleStart(bottomUrl)}
+                className="px-8 py-4 bg-white text-[#C24516] rounded-lg font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
+              >
+                Start free
+              </button>
+            </div>
+            <p className="text-sm opacity-75">
+              Preview free. Upgrade to Premium anytime.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Cross-sell Section */}
+      <section className="bg-[#1a1a1c] py-20 px-8 text-center border-t border-[rgba(250,247,242,0.12)]">
+        <div className="max-w-[800px] mx-auto">
+          <h3 className="text-2xl font-semibold mb-6 text-[#faf7f2]">
+            Built with Annexa. Now make it distinctive.
+          </h3>
+          <p className="text-lg text-[rgba(250,247,242,0.7)] leading-relaxed mb-6">
+            Most SaaS products look identical because AI tools use the same templates. Vox Animus structures your brand intent into enforceable prompts for Bolt, Cursor, and Lovable.
+          </p>
+          <a
+            href="https://vox-animus.com/demo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[#C24516] hover:brightness-110 hover:underline transition-all duration-150"
+          >
+            See how it works &#8594;
+          </a>
+        </div>
+      </section>
+    </div>
+  );
 }

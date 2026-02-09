@@ -152,20 +152,48 @@ export default function CompetitiveResults() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
+      {/* VIP Hero Section */}
+      <div className="bg-gradient-to-b from-[#C24516]/10 to-transparent py-16 border-b-2 border-[#C24516]/20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-block px-4 py-2 bg-[#C24516] text-white rounded-full text-sm font-medium mb-6">
+            &#10003; Premium Access
+          </div>
           <h1 className="font-serif text-4xl md:text-5xl mb-4 text-[#faf7f2]">
-            Your Competitive Intelligence
+            Welcome to competitive intelligence
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto font-sans">
-            Here's how <span className="font-medium text-[#faf7f2]">{radarData.userName}</span> compares
-            to <span className="font-medium text-[#faf7f2]">{radarData.competitorName}</span> across
-            key market dimensions.
+            Your radar chart is ready. See exactly where you stand vs{' '}
+            <span className="font-medium text-[#faf7f2]">{radarData.competitorName}</span>.
           </p>
         </div>
+      </div>
 
+      {/* Quick Stats */}
+      <div className="max-w-6xl mx-auto px-4 -mt-8 mb-12">
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-zinc-900 border-2 border-[#C24516]/20 rounded-xl p-6 text-center">
+            <div className="text-3xl font-bold text-[#C24516] mb-2">
+              {radarData.axes.length}
+            </div>
+            <div className="text-sm text-zinc-400">Market Dimensions</div>
+          </div>
+          <div className="bg-zinc-900 border-2 border-[#C24516]/20 rounded-xl p-6 text-center">
+            <div className="text-3xl font-bold text-[#C24516] mb-2">
+              {radarData.strengths.length}
+            </div>
+            <div className="text-sm text-zinc-400">Your Strengths</div>
+          </div>
+          <div className="bg-zinc-900 border-2 border-[#C24516]/20 rounded-xl p-6 text-center">
+            <div className="text-3xl font-bold text-[#C24516] mb-2">
+              {radarData.opportunities.length}
+            </div>
+            <div className="text-sm text-zinc-400">Growth Opportunities</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Radar Chart */}
         <div className="mb-16 p-8 border-2 border-[#C24516]/30 rounded-lg bg-[#C24516]/5">
           <PostPaymentRadarChart
