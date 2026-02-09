@@ -421,7 +421,7 @@ export default function UpsellModal({
             </div>
 
             <div className="space-y-2">
-              <Button 
+              <Button
                 onClick={async () => {
                   // Check if running in iframe
                   if (window.self !== window.top) {
@@ -429,9 +429,29 @@ export default function UpsellModal({
                     return;
                   }
 
+                  // Store form data and documents in localStorage for PremiumDashboard
+                  try {
+                    if (formData) {
+                      localStorage.setItem('annexa_premium_form_data', JSON.stringify(formData));
+                    }
+                    if (documents || socialBios || technicalFiles) {
+                      localStorage.setItem('annexa_premium_documents', JSON.stringify({
+                        documents: documents || {},
+                        socialBios: socialBios || null,
+                        technicalFiles: technicalFiles || null,
+                      }));
+                    }
+                  } catch (e) {
+                    console.warn('Failed to cache form data:', e);
+                  }
+
                   try {
                     const response = await base44.functions.invoke('createCheckoutSession', {
                       returnUrl: window.location.origin,
+                      userWebsiteURL: formData?.website_url || '',
+                      businessName: formData?.company_name || '',
+                      productDescription: formData?.product_description || '',
+                      email: formData?.contact_email || '',
                     });
 
                     if (response.data.success && response.data.checkoutUrl) {

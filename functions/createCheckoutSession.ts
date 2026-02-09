@@ -16,9 +16,9 @@ Deno.serve(async (req) => {
       email,
     } = await req.json();
 
-    // Build URLs - redirect to CompetitiveResults after payment
+    // Build URLs - redirect to PremiumDashboard after payment
     const baseUrl = returnUrl || req.headers.get('origin') || '';
-    const successUrl = `${baseUrl}/CompetitiveResults?session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl = `${baseUrl}/PremiumDashboard?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/Form?payment=cancelled`;
 
     // Build metadata for webhook radar generation (Stripe limits: 500 chars per value)
