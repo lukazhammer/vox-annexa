@@ -4,7 +4,7 @@ import JSZip from 'npm:jszip@3.10.1';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { email, documents, formData } = await req.json();
+    const { email, documents, formData, marketingOptIn = false } = await req.json();
 
     if (!email || !documents) {
       return Response.json({ error: 'Email and documents are required' }, { status: 400 });
@@ -63,6 +63,8 @@ Questions? Just reply to this email.
 
 Best,
 The Annexa Team
+
+Marketing updates: ${marketingOptIn ? 'Opted in' : 'Not opted in'}
 
 ─────────────────────────────────────────────
 

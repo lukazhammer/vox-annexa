@@ -4,7 +4,7 @@ import { jsPDF } from 'npm:jspdf@2.5.2';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { documents, productName, contactEmail, withWatermark } = await req.json();
+    const { documents, productName, contactEmail, withWatermark, marketingOptIn = false } = await req.json();
 
     if (!documents || !productName || !contactEmail) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
@@ -97,6 +97,8 @@ Questions? Just reply to this email.
 
 Best,
 The Annexa Team
+
+Marketing updates: ${marketingOptIn ? 'Opted in' : 'Not opted in'}
 
 ─────────────────────────────────────────────
 

@@ -24,16 +24,9 @@ import { upgradeToEdge, getUserTier } from '@/lib/tierUtils';
 export default function Form() {
   const navigate = useNavigate();
   const location = useLocation();
-  const scanResults = location.state?.scanResults || location.state?.crawledData;
-  const websiteUrl = location.state?.websiteUrl || localStorage.getItem('userWebsiteURL') || '';
+  const scanResults = location.state?.scanResults;
+  const websiteUrl = location.state?.websiteUrl;
   const existingData = location.state?.formData;
-  const isManualEntry = location.state?.manualEntry === true;
-
-  // Track which fields were auto-filled from crawl
-  const [autofilledFields, setAutofilledFields] = useState(new Set());
-  
-  // Track if user just returned from successful payment
-  const [highlightAnalyze, setHighlightAnalyze] = useState(false);
 
   const [formData, setFormData] = useState({
     company_name: '',
@@ -81,46 +74,6 @@ export default function Form() {
   const [showCompetitiveIntel, setShowCompetitiveIntel] = useState(false);
 
   useEffect(() => {
-    // Route protection: redirect to URLCapture if no data source
-    const urlParams = new URLSearchParams(window.location.search);
-    const resumeId = urlParams.get('resume');
-    const storedURL = localStorage.getItem('userWebsiteURL');
-    const savedDraft = localStorage.getItem('vox-launch-kit-draft');
-    const hasDataSource = resumeId || existingData || scanResults || isManualEntry || storedURL || savedDraft;
-    
-    // Handle Stripe payment success
-    const paymentStatus = urlParams.get('payment');
-    const tierFromUrl = urlParams.get('tier');
-    const checkoutSessionId = urlParams.get('session_id') || urlParams.get('stripe_session_id');
-    const checkoutHint = urlParams.get('checkout');
-    if (
-      checkoutSessionId ||
-      checkoutHint === 'success' ||
-      (paymentStatus === 'success' && (tierFromUrl === 'premium' || tierFromUrl === 'edge'))
-    ) {
-      upgradeToEdge(checkoutSessionId || 'stripe_checkout_' + Date.now());
-      setIsEdge(true);
-      setHighlightAnalyze(true);
-      setShowCompetitiveIntel(true);
-      
-      // Clean up URL params
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, '', cleanUrl);
-      
-      // Remove highlight after 5 seconds
-      setTimeout(() => setHighlightAnalyze(false), 5000);
-      
-      base44.analytics.track({
-        eventName: 'edge_upgrade_completed',
-        properties: { source: 'stripe_checkout' }
-      });
-    }
-
-    if (!hasDataSource) {
-      navigate('/URLCapture');
-      return;
-    }
-
     // Detect user location
     const detectUserLocation = async () => {
       try {
@@ -135,6 +88,17 @@ export default function Form() {
     };
     detectUserLocation();
 
+    // Check for resume link in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const resumeId = urlParams.get('resume');
+    const checkoutSessionId = urlParams.get('session_id') || urlParams.get('stripe_session_id');
+    const checkoutStatus = urlParams.get('checkout');
+
+    if (checkoutSessionId || checkoutStatus === 'success') {
+      upgradeToEdge(checkoutSessionId || 'edge_' + Date.now());
+      setIsEdge(true);
+    }
+
     if (resumeId) {
       loadSavedProgress(resumeId);
     } else if (existingData) {
@@ -144,59 +108,13 @@ export default function Form() {
         setCustomCookies(existingData.cookie_level || 'analytics');
       }
     } else if (scanResults?.prefilled) {
-      // Enhanced auto-population from crawled data
-      const prefilled = scanResults.prefilled;
-      const filledFields = new Set();
-      const populatedData = { ...formData };
-
-      if (prefilled.company_name) {
-        populatedData.company_name = prefilled.company_name;
-        filledFields.add('company_name');
-      }
-      if (prefilled.product_description) {
-        populatedData.product_description = prefilled.product_description;
-        filledFields.add('product_description');
-      }
-      if (prefilled.contact_email) {
-        populatedData.contact_email = prefilled.contact_email;
-        filledFields.add('contact_email');
-      }
-      if (prefilled.country) {
-        populatedData.country = prefilled.country;
-        filledFields.add('country');
-      }
-      if (prefilled.services_used) {
-        populatedData.services_used = prefilled.services_used;
-        filledFields.add('services_used');
-      }
-      if (prefilled.cookie_level) {
-        populatedData.cookie_level = prefilled.cookie_level;
-        filledFields.add('cookie_level');
-      }
-
-      // Always set website_url from crawl
-      populatedData.website_url = websiteUrl || prefilled.url || '';
-
-      // Set preset based on detected services
-      const services = prefilled.thirdPartyServices || [];
-      if (services.some(s => s.includes('Shopify'))) {
-        populatedData.preset = 'ecommerce';
-      }
-
-      setFormData(populatedData);
-      setAutofilledFields(filledFields);
-
-      // Track auto-fill analytics
-      base44.analytics.track({
-        eventName: 'form_autofilled_from_crawl',
-        properties: {
-          fields_filled: filledFields.size,
-          fields: Array.from(filledFields),
-          url: websiteUrl,
-        }
-      });
+      setFormData(prev => ({
+        ...prev,
+        ...scanResults.prefilled
+      }));
     } else {
       // Check for saved draft in localStorage
+      const savedDraft = localStorage.getItem('vox-launch-kit-draft');
       if (savedDraft) {
         try {
           const draft = JSON.parse(savedDraft);
@@ -216,41 +134,6 @@ export default function Form() {
         }
       } else {
         handlePresetChange('standard');
-      }
-
-      // Also try loading from localStorage crawled data (for page refreshes)
-      const storedCrawlData = localStorage.getItem('crawledWebsiteData');
-      if (storedCrawlData && !savedDraft) {
-        try {
-          const crawled = JSON.parse(storedCrawlData);
-          if (crawled.prefilled) {
-            const prefilled = crawled.prefilled;
-            const filledFields = new Set();
-            const populatedData = { ...formData };
-
-            if (prefilled.company_name) {
-              populatedData.company_name = prefilled.company_name;
-              filledFields.add('company_name');
-            }
-            if (prefilled.product_description) {
-              populatedData.product_description = prefilled.product_description;
-              filledFields.add('product_description');
-            }
-            if (prefilled.contact_email) {
-              populatedData.contact_email = prefilled.contact_email;
-              filledFields.add('contact_email');
-            }
-            if (prefilled.country) {
-              populatedData.country = prefilled.country;
-              filledFields.add('country');
-            }
-            populatedData.website_url = storedURL || '';
-            setFormData(populatedData);
-            setAutofilledFields(filledFields);
-          }
-        } catch {
-          // Invalid stored data, ignore
-        }
       }
     }
   }, [scanResults, existingData]);
@@ -323,7 +206,7 @@ export default function Form() {
     const handleMouseLeave = (e) => {
       // Check if mouse is leaving from top of viewport
       if (e.clientY <= 0) {
-        const requiredFields = ['company_name', 'product_description', 'company_lead', 'country', 'contact_email'];
+        const requiredFields = ['company_name', 'product_description', 'company_lead', 'country'];
         const filledFields = requiredFields.filter(key => formData[key]?.toString().trim()).length;
         const progressPercentage = Math.round((filledFields / requiredFields.length) * 100);
         const allFieldsFilled = isStep1Complete() && isStep2Complete() && isStep3Complete();
@@ -342,10 +225,13 @@ export default function Form() {
 
   useEffect(() => {
     if (showExitIntent) {
+      const progress = calculateProgress();
+      const totalCompleted = progress.foundation.completed + progress.legalBasics.completed + progress.contact.completed;
+      const totalFields = progress.foundation.fields.length + progress.legalBasics.fields.length + progress.contact.fields.length;
       base44.analytics.track({
         eventName: 'launch_kit_exit_intent_shown',
         properties: {
-          completion_percentage: Math.round((calculateProgress().completed / calculateProgress().total) * 100)
+          completion_percentage: Math.round((totalCompleted / totalFields) * 100)
         }
       });
     }
@@ -378,7 +264,7 @@ export default function Form() {
         return `Add at least 50 characters (${value.trim().length}/50)`;
       }
     }
-    const requiredFields = ['company_name', 'product_description', 'company_lead', 'country', 'contact_email'];
+    const requiredFields = ['company_name', 'product_description', 'company_lead', 'country'];
     if (requiredFields.includes(field) && !value?.trim()) {
       return 'This field is required';
     }
@@ -409,7 +295,7 @@ export default function Form() {
     }
 
     // Track first field filled
-    const requiredFields = ['company_name', 'product_description', 'company_lead', 'country', 'contact_email'];
+    const requiredFields = ['company_name', 'product_description', 'company_lead', 'country'];
     const wasEmpty = requiredFields.every(f => !formData[f]?.trim());
     if (wasEmpty && value?.trim()) {
       base44.analytics.track({
@@ -539,7 +425,7 @@ export default function Form() {
   };
 
   const isStep3Complete = () => {
-    return formData.company_lead?.trim() && formData.contact_email?.trim();
+    return formData.company_lead?.trim();
   };
 
   const calculateProgress = () => {
@@ -552,14 +438,14 @@ export default function Form() {
       completed: ['country', 'preset'].filter(f => formData[f]?.trim()).length
     };
     const contact = {
-      fields: ['company_lead', 'contact_email'],
-      completed: ['company_lead', 'contact_email'].filter(f => formData[f]?.trim()).length
+      fields: ['company_lead'],
+      completed: ['company_lead'].filter(f => formData[f]?.trim()).length
     };
     return { foundation, legalBasics, contact };
   };
 
   const validateForm = () => {
-    const requiredFields = ['company_name', 'product_description', 'company_lead', 'country', 'contact_email'];
+    const requiredFields = ['company_name', 'product_description', 'company_lead', 'country'];
     const newErrors = {};
     const newTouched = {};
 
@@ -644,55 +530,35 @@ export default function Form() {
     });
   };
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = () => {
     base44.analytics.track({
       eventName: 'launch_kit_upsell_clicked',
       properties: { tier: 'free' }
     });
 
-    // Store form data and documents in localStorage for PremiumDashboard
-    try {
-      localStorage.setItem('annexa_premium_form_data', JSON.stringify(formData));
-      if (generatedDocuments) {
-        localStorage.setItem('annexa_premium_documents', JSON.stringify({
-          documents: generatedDocuments.documents || {},
-          socialBios: generatedDocuments.socialBios || null,
-          technicalFiles: generatedDocuments.technicalFiles || null,
-        }));
+    // TODO: Implement Stripe payment
+    // For now, persist tier to localStorage (survives page refresh)
+    upgradeToEdge('placeholder_' + Date.now());
+
+    setIsEdge(true);
+    setShowUpsellModal(false);
+    navigate('/preview', {
+      state: {
+        documents: generatedDocuments?.documents,
+        socialBios: generatedDocuments?.socialBios,
+        technicalFiles: generatedDocuments?.technicalFiles,
+        competitiveIntel: competitiveIntel,
+        formData: formData,
+        tier: 'edge' // Backup in navigation state
       }
-    } catch (e) {
-      console.warn('Failed to cache form data:', e);
-    }
-
-    // Check if running in iframe
-    if (window.self !== window.top) {
-      alert('Checkout works only from the published app. Please open this page directly.');
-      return;
-    }
-
-    try {
-      const response = await base44.functions.invoke('createCheckoutSession', {
-        returnUrl: window.location.origin,
-        userWebsiteURL: formData.website_url || '',
-        businessName: formData.company_name || '',
-        productDescription: formData.product_description || '',
-        email: formData.contact_email || '',
-      });
-
-      if (response.data.success && response.data.checkoutUrl) {
-        window.location.href = response.data.checkoutUrl;
-      } else {
-        throw new Error(response.data.error || 'Failed to create checkout');
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      alert('Failed to start checkout. Please try again.');
-    }
+    });
   };
 
   const handleSaveProgress = async (email) => {
     const progress = calculateProgress();
-    const progressPercentage = Math.round((progress.completed / progress.total) * 100);
+    const totalCompleted = progress.foundation.completed + progress.legalBasics.completed + progress.contact.completed;
+    const totalFields = progress.foundation.fields.length + progress.legalBasics.fields.length + progress.contact.fields.length;
+    const progressPercentage = Math.round((totalCompleted / totalFields) * 100);
 
     await base44.functions.invoke('saveProgress', {
       email,
@@ -704,7 +570,7 @@ export default function Form() {
       eventName: 'launch_kit_exit_intent_submitted',
       properties: {
         completion_percentage: progressPercentage,
-        fields_filled: progress.completed
+        fields_filled: totalCompleted
       }
     });
 
@@ -712,10 +578,14 @@ export default function Form() {
   };
 
   const handleExitIntentDismiss = () => {
+    const progress = calculateProgress();
+    const totalCompleted = progress.foundation.completed + progress.legalBasics.completed + progress.contact.completed;
+    const totalFields = progress.foundation.fields.length + progress.legalBasics.fields.length + progress.contact.fields.length;
+
     base44.analytics.track({
       eventName: 'launch_kit_exit_intent_dismissed',
       properties: {
-        completion_percentage: Math.round((calculateProgress().completed / calculateProgress().total) * 100)
+        completion_percentage: Math.round((totalCompleted / totalFields) * 100)
       }
     });
 
@@ -768,10 +638,10 @@ export default function Form() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12 pb-32 md:pb-12">
       <button
-        onClick={() => navigate('/URLCapture')}
+        onClick={() => navigate('/')}
         className="text-zinc-400 hover:text-white mb-6 flex items-center text-sm"
       >
-        ← Back to URL capture
+        ← Back to start
       </button>
 
       <LegalBanner />
@@ -797,9 +667,9 @@ export default function Form() {
 
       {/* Two-Pane Layout */}
       <div className="flex flex-col lg:grid lg:grid-cols-11 gap-6 sm:gap-8">
-        {/* LEFT PANE - Form (wider to accommodate competitive analysis) */}
-        <div className="lg:col-span-6 order-1">
-          <div className="lg:sticky lg:top-6 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 sm:p-6 max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--app-accent)] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:var(--app-accent)_transparent]">
+        {/* LEFT PANE - Form */}
+        <div className="lg:col-span-5 order-1">
+          <div className="lg:sticky lg:top-6 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 sm:p-6 lg:max-w-[500px] max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#C24516] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:#C24516_transparent]">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
               <h2 className="text-xl sm:text-2xl font-bold">Tell us about your product</h2>
               <div className="flex items-center gap-2">
@@ -819,8 +689,8 @@ export default function Form() {
                   </button>
                   {showKeyboardHelp && (
                     <div className="absolute right-0 top-6 bg-[#09090B] border border-zinc-800 rounded-lg p-3 w-48 text-xs text-zinc-300 space-y-1.5 z-10 shadow-lg">
-                      <div><span className="text-[var(--app-accent)] font-semibold">⌘ + S</span> Save draft</div>
-                      <div><span className="text-[var(--app-accent)] font-semibold">⌘ + ↵</span> Next section</div>
+                      <div><span className="text-[#C24516] font-semibold">⌘ + S</span> Save draft</div>
+                      <div><span className="text-[#C24516] font-semibold">⌘ + ↵</span> Next section</div>
                       <div className="text-zinc-500 text-[11px] pt-1.5 border-t border-zinc-800">Tab through fields</div>
                     </div>
                   )}
@@ -831,17 +701,10 @@ export default function Form() {
               Foundation questions. These populate your Privacy Policy, Terms, and About page.
             </p>
 
-            {autofilledFields.size > 0 && (
-              <div className="mb-4 flex items-center gap-2 text-xs text-[var(--app-accent)] bg-[var(--app-accent)]/5 border border-[var(--app-accent)]/20 rounded px-3 py-2">
-                <Check className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>{autofilledFields.size} field{autofilledFields.size !== 1 ? 's' : ''} pre-filled from your website</span>
-              </div>
-            )}
-
             {scanResults?.found && scanResults.found.length > 0 && (
               <details className="mb-6 group">
                 <summary className="cursor-pointer text-sm text-[rgba(250,247,242,0.7)] hover:text-[#faf7f2] transition-colors list-none flex items-center gap-2">
-                  <span className="text-[var(--app-accent)]">▼</span>
+                  <span className="text-[#C24516]">▼</span>
                   <span>We found these existing files ({scanResults.found.length})</span>
                 </summary>
                 <div className="mt-3 pl-6 flex flex-wrap gap-2">
@@ -864,12 +727,7 @@ export default function Form() {
                 </div>
 
                 <div>
-                  <Label className="text-white mb-2 block text-base sm:text-sm">
-                    What should we call your product? *
-                    {autofilledFields.has('company_name') && (
-                      <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
-                    )}
-                  </Label>
+                  <Label className="text-white mb-2 block text-base sm:text-sm">What should we call your product? *</Label>
                   <Input
                     value={formData.company_name}
                     onChange={(e) => handleChange('company_name', e.target.value)}
@@ -879,7 +737,7 @@ export default function Form() {
                       setHighlightedField(null);
                     }}
                     className={`bg-zinc-900 border-zinc-800 text-white text-base h-12 sm:h-10 ${errors.company_name && touched.company_name ? 'border-red-500' : ''
-                      } ${autofilledFields.has('company_name') ? 'border-[var(--app-accent)]/30' : ''}`}
+                      }`}
                     placeholder="TaskFlow"
                   />
                   {errors.company_name && touched.company_name && (
@@ -888,12 +746,7 @@ export default function Form() {
                 </div>
 
                 <div>
-                  <Label className="text-white mb-2 block text-base sm:text-sm">
-                    Describe your product in one sentence *
-                    {autofilledFields.has('product_description') && (
-                      <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
-                    )}
-                  </Label>
+                  <Label className="text-white mb-2 block text-base sm:text-sm">Describe your product in one sentence *</Label>
                   <Textarea
                     value={formData.product_description}
                     onChange={(e) => handleChange('product_description', e.target.value)}
@@ -930,7 +783,7 @@ export default function Form() {
                     }}
                     disabled={!isStep1Complete()}
                     className={`w-full h-12 text-base transition-all ${isStep1Complete()
-                        ? 'bg-[var(--app-accent)] hover:brightness-90 text-white cursor-pointer'
+                        ? 'bg-[#C24516] hover:bg-[#a33912] text-white cursor-pointer'
                         : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
                       }`}
                   >
@@ -944,8 +797,6 @@ export default function Form() {
                     <CompetitiveIntelligence
                       formData={formData}
                       tier={isEdge ? 'edge' : 'free'}
-                      crawledWebsiteData={scanResults?.prefilled || null}
-                      highlightAnalyze={highlightAnalyze}
                       onComplete={(intel) => {
                         setCompetitiveIntel(intel);
                         setCurrentStep(2);
@@ -962,7 +813,9 @@ export default function Form() {
                         });
                       }}
                       onUpgrade={() => {
-                        // Handled inside CompetitiveIntelligence component now
+                        // TODO: Implement Stripe payment
+                        upgradeToEdge('competitive_' + Date.now());
+                        setIsEdge(true);
                         base44.analytics.track({
                           eventName: 'competitive_intel_edge_clicked',
                           properties: {}
@@ -982,12 +835,7 @@ export default function Form() {
                   </div>
 
                   <div>
-                    <Label className="text-white mb-2 block text-base sm:text-sm">
-                      Where is your company based? *
-                      {autofilledFields.has('country') && (
-                        <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
-                      )}
-                    </Label>
+                    <Label className="text-white mb-2 block text-base sm:text-sm">Where is your company based? *</Label>
                     <Input
                       value={formData.country}
                       onChange={(e) => handleChange('country', e.target.value)}
@@ -1001,7 +849,7 @@ export default function Form() {
                     )}
                     {formData.jurisdiction && (
                       <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded px-3 py-2">
-                        <Info className="w-3.5 h-3.5 text-[var(--app-accent)] flex-shrink-0" />
+                        <Info className="w-3.5 h-3.5 text-[#C24516] flex-shrink-0" />
                         <span>
                           {formData.jurisdiction === 'eu' && 'GDPR compliance applies'}
                           {formData.jurisdiction === 'us' && 'CCPA compliance applies'}
@@ -1031,7 +879,7 @@ export default function Form() {
                     <Button
                       type="button"
                       onClick={() => setCurrentStep(3)}
-                      className="w-full bg-[var(--app-accent)] hover:brightness-90 text-white h-12 text-base hidden md:flex"
+                      className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12 text-base hidden md:flex"
                     >
                       Continue to Contact <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -1063,12 +911,7 @@ export default function Form() {
                   </div>
 
                   <div>
-                    <Label className="text-white mb-2 block text-base sm:text-sm">
-                      Where can users reach you? *
-                      {autofilledFields.has('contact_email') && (
-                        <span className="ml-2 text-xs text-[var(--app-accent)] font-normal">Auto-filled</span>
-                      )}
-                    </Label>
+                    <Label className="text-white mb-2 block text-base sm:text-sm">Public support email (optional)</Label>
                     <Input
                       type="email"
                       value={formData.contact_email}
@@ -1078,6 +921,7 @@ export default function Form() {
                         }`}
                       placeholder="hello@acme.com"
                     />
+                    <p className="text-zinc-500 text-xs mt-1">Used in your generated docs if provided.</p>
                     {errors.contact_email && touched.contact_email && (
                       <p className="text-red-500 text-xs mt-1">{errors.contact_email}</p>
                     )}
@@ -1086,9 +930,9 @@ export default function Form() {
                   {/* EDGE Fields Section */}
                   {isEdge && (
                     <div className="mt-6 pt-6 border-t border-zinc-700 space-y-4">
-                      <div className="bg-[var(--app-accent)]/10 border border-[var(--app-accent)]/30 rounded-lg p-4 mb-4">
+                      <div className="bg-[#C24516]/10 border border-[#C24516]/30 rounded-lg p-4 mb-4">
                         <p className="text-sm text-zinc-300">
-                          <span className="text-[var(--app-accent)] font-semibold">EDGE:</span> Answer these to get competitive analysis and social bios
+                          <span className="text-[#C24516] font-semibold">EDGE:</span> Answer these to get competitive analysis and social bios
                         </p>
                       </div>
 
@@ -1119,7 +963,7 @@ export default function Form() {
                           value={formData.target_pain_points}
                           onChange={(e) => handleChange('target_pain_points', e.target.value)}
                           className="bg-zinc-900 border-zinc-800 text-white text-base min-h-[80px]"
-                          placeholder="What frustrates your users about current alternatives?"
+                          placeholder="What frustrates your users about current solutions?"
                           rows={3}
                         />
                       </div>
@@ -1146,7 +990,7 @@ export default function Form() {
                               <RadioGroupItem value="professional" id="tone-professional" />
                               <Label
                                 htmlFor="tone-professional"
-                                className={`font-normal cursor-pointer ${formData.tone_preference === 'professional' ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
+                                className={`font-normal cursor-pointer ${formData.tone_preference === 'professional' ? 'text-[#C24516]' : 'text-zinc-300'}`}
                               >
                                 Professional and formal
                               </Label>
@@ -1155,7 +999,7 @@ export default function Form() {
                               <RadioGroupItem value="conversational" id="tone-conversational" />
                               <Label
                                 htmlFor="tone-conversational"
-                                className={`font-normal cursor-pointer ${formData.tone_preference === 'conversational' ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
+                                className={`font-normal cursor-pointer ${formData.tone_preference === 'conversational' ? 'text-[#C24516]' : 'text-zinc-300'}`}
                               >
                                 Conversational and friendly
                               </Label>
@@ -1164,7 +1008,7 @@ export default function Form() {
                               <RadioGroupItem value="technical" id="tone-technical" />
                               <Label
                                 htmlFor="tone-technical"
-                                className={`font-normal cursor-pointer ${formData.tone_preference === 'technical' ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
+                                className={`font-normal cursor-pointer ${formData.tone_preference === 'technical' ? 'text-[#C24516]' : 'text-zinc-300'}`}
                               >
                                 Technical and precise
                               </Label>
@@ -1190,7 +1034,7 @@ export default function Form() {
                             />
                             <Label
                               htmlFor="strategy-community"
-                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('community') ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
+                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('community') ? 'text-[#C24516]' : 'text-zinc-300'}`}
                             >
                               Building community
                             </Label>
@@ -1209,7 +1053,7 @@ export default function Form() {
                             />
                             <Label
                               htmlFor="strategy-launches"
-                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('launches') ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
+                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('launches') ? 'text-[#C24516]' : 'text-zinc-300'}`}
                             >
                               Announcing launches
                             </Label>
@@ -1228,7 +1072,7 @@ export default function Form() {
                             />
                             <Label
                               htmlFor="strategy-updates"
-                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('updates') ? 'text-[var(--app-accent)]' : 'text-zinc-300'}`}
+                              className={`font-normal cursor-pointer ${formData.social_strategies?.includes('updates') ? 'text-[#C24516]' : 'text-zinc-300'}`}
                             >
                               Sharing updates
                             </Label>
@@ -1290,7 +1134,7 @@ export default function Form() {
         </div>
 
         {/* RIGHT PANE - Live Preview */}
-        <div className="lg:col-span-5 order-2">
+        <div className="lg:col-span-6 order-2">
           <LivePreview
             formData={formData}
             highlightedField={highlightedField}
@@ -1305,7 +1149,7 @@ export default function Form() {
           <div className="flex items-center gap-2 text-xs text-zinc-400">
             <span>Step {currentStep} of 3</span>
             <span>•</span>
-            <span className="text-[var(--app-accent)]">
+            <span className="text-[#C24516]">
               {currentStep === 1 && `${progress.foundation.completed}/${progress.foundation.fields.length} complete`}
               {currentStep === 2 && `${progress.legalBasics.completed}/${progress.legalBasics.fields.length} complete`}
               {currentStep === 3 && `${progress.contact.completed}/${progress.contact.fields.length} complete`}
@@ -1314,7 +1158,7 @@ export default function Form() {
           <Button
             onClick={nextAction}
             disabled={generating}
-            className="w-full bg-[var(--app-accent)] hover:brightness-90 text-white h-14 text-base font-semibold"
+            className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-14 text-base font-semibold"
           >
             {generating ? (
               <div className="flex flex-col items-center w-full">
@@ -1370,13 +1214,13 @@ export default function Form() {
             <div className="flex gap-3 justify-end">
               <Button
                 onClick={() => setShowDeleteDraftModal(false)}
-                className="bg-white text-[#09090B] hover:bg-[#faf7f2] hover:border-[var(--app-accent)]"
+                className="bg-white text-[#09090B] hover:bg-[#faf7f2] hover:border-[#C24516]"
               >
                 Cancel
               </Button>
               <Button
                 onClick={confirmDeleteDraft}
-                className="bg-[var(--app-accent)] hover:brightness-90 text-white"
+                className="bg-[#C24516] hover:bg-[#a33912] text-white"
               >
                 Delete draft
               </Button>

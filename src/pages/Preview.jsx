@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Download, Edit, CheckCircle, Mail } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -38,6 +39,7 @@ export default function Preview() {
   const [emailAddress, setEmailAddress] = useState(formData.contact_email || '');
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
 
   const docList = [
     'Privacy Policy',
@@ -108,7 +110,15 @@ export default function Preview() {
       await base44.functions.invoke('emailDocuments', {
         email: emailAddress,
         documents,
-        formData
+        formData,
+        marketingOptIn
+      });
+      base44.analytics.track({
+        eventName: 'launch_kit_delivery_email_submitted',
+        properties: {
+          tier,
+          marketing_opt_in: marketingOptIn
+        }
       });
       setEmailSent(true);
       setTimeout(() => {
@@ -303,13 +313,13 @@ export default function Preview() {
       <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Email Your Documents</DialogTitle>
+            <DialogTitle className="text-xl font-bold">Where should we send the ZIP?</DialogTitle>
           </DialogHeader>
 
           {!emailSent ? (
             <div className="space-y-4">
               <p className="text-zinc-400 text-sm">
-                We'll send you a ZIP file with all 8 documents (with watermark). Perfect for mobile users.
+                We will email a ZIP download link for your documents.
               </p>
               <div>
                 <Input
@@ -320,6 +330,13 @@ export default function Preview() {
                   className="bg-zinc-800 border-zinc-700 text-white"
                 />
               </div>
+              <label className="flex items-start gap-2 text-xs text-zinc-400">
+                <Checkbox
+                  checked={marketingOptIn}
+                  onCheckedChange={(checked) => setMarketingOptIn(Boolean(checked))}
+                />
+                <span>Send me optional product updates by email.</span>
+              </label>
               <Button
                 onClick={handleEmailDocuments}
                 disabled={emailSending || !emailAddress}

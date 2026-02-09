@@ -3,19 +3,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Check, Download, Loader2, Mail, CheckCircle, ExternalLink, Copy, FileText } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-
-// Tier utilities - inline to avoid import issues
-const getUserTier = () => {
-  if (typeof window === 'undefined') return 'free';
-  return localStorage.getItem('annexa_tier') || 'free';
-};
+import { getUserTier } from '@/lib/tierUtils';
 
 export default function UpsellModal({
   open,
   onOpenChange,
   onDownloadFree,
   onUpgrade,
-  isPremium: isPremiumProp, // Keep for backward compatibility
+  isEdge: isEdgeProp,
+  isPremium: isPremiumProp, // Backward compatibility
   documents,
   socialBios,
   technicalFiles,
@@ -25,13 +21,10 @@ export default function UpsellModal({
 }) {
   // Use persistent tier from localStorage, fallback to props
   const tier = getUserTier() || tierProp || 'free';
-  const isPremium = tier === 'edge' || tier === 'premium' || isPremiumProp;
+  const isEdge = tier === 'edge' || isEdgeProp || isPremiumProp;
 
   const [downloading, setDownloading] = useState(false);
-  const [emailing, setEmailing] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
-  const [emailError, setEmailError] = useState(null);
   const [showVoxPromo, setShowVoxPromo] = useState(true);
   const [copiedBio, setCopiedBio] = useState(null);
   const [showLlmsTxt, setShowLlmsTxt] = useState(false);
@@ -93,7 +86,7 @@ export default function UpsellModal({
   };
 
   const handleDownloadMarkdown = async () => {
-    if (!isPremium) return;
+    if (!isEdge) return;
 
     setDownloading(true);
     setDownloadError(null);
@@ -115,7 +108,7 @@ export default function UpsellModal({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `annexa-premium-${formData.company_name.toLowerCase().replace(/\s+/g, '-')}.zip`;
+      a.download = `annexa-edge-${formData.company_name.toLowerCase().replace(/\s+/g, '-')}.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -127,27 +120,8 @@ export default function UpsellModal({
     }
   };
 
-  const handleEmailCopy = async () => {
-    setEmailing(true);
-    setEmailError(null);
-    try {
-      await base44.functions.invoke('emailLaunchKit', {
-        documents,
-        productName: formData.company_name,
-        contactEmail: formData.contact_email,
-        withWatermark: tier === 'free'
-      });
-      setEmailSent(true);
-      setTimeout(() => setEmailSent(false), 3000);
-    } catch (err) {
-      setEmailError('Failed to send email. Please try again.');
-    } finally {
-      setEmailing(false);
-    }
-  };
-
-  // Premium modal
-  if (isPremium) {
+  // EDGE modal
+  if (isEdge) {
     const hasCompetitiveIntel = competitiveIntel && competitiveIntel.competitor;
 
     return (
@@ -267,9 +241,9 @@ export default function UpsellModal({
               </div>
             )}
 
-            {(downloadError || emailError) && (
+            {downloadError && (
               <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3">
-                <p className="text-red-500 text-sm">{downloadError || emailError}</p>
+                <p className="text-red-500 text-sm">{downloadError}</p>
               </div>
             )}
 
@@ -297,18 +271,11 @@ export default function UpsellModal({
                   <Download className="w-4 h-4 mr-2" />PDF Only
                 </Button>
                 <Button
-                  onClick={handleEmailCopy}
-                  disabled={emailing}
+                  onClick={onDownloadFree}
                   variant="outline"
                   className="flex-1 border-zinc-700 text-white hover:bg-zinc-800"
                 >
-                  {emailing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : emailSent ? (
-                    <><CheckCircle className="w-4 h-4 mr-2 text-green-500" />Sent!</>
-                  ) : (
-                    <><Mail className="w-4 h-4 mr-2" />Email</>
-                  )}
+                  <><Mail className="w-4 h-4 mr-2" />View documents</>
                 </Button>
               </div>
 
@@ -380,9 +347,9 @@ export default function UpsellModal({
             </div>
           </div>
 
-          {(downloadError || emailError) && (
+          {downloadError && (
             <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3">
-              <p className="text-red-500 text-sm">{downloadError || emailError}</p>
+              <p className="text-red-500 text-sm">{downloadError}</p>
             </div>
           )}
 
@@ -402,14 +369,6 @@ export default function UpsellModal({
             <button onClick={onDownloadFree} className="hover:text-white transition-colors">
               View documents
             </button>
-            <span className="text-zinc-600">|</span>
-            <button
-              onClick={handleEmailCopy}
-              disabled={emailing}
-              className="hover:text-white transition-colors disabled:opacity-50"
-            >
-              {emailing ? 'Sending...' : emailSent ? `Sent to ${formData.contact_email}!` : 'Email to me'}
-            </button>
           </div>
 
           <div className="border-t border-zinc-800 pt-6 space-y-4">
@@ -421,51 +380,7 @@ export default function UpsellModal({
             </div>
 
             <div className="space-y-2">
-              <Button
-                onClick={async () => {
-                  // Check if running in iframe
-                  if (window.self !== window.top) {
-                    alert('Checkout works only from the published app. Please open this page directly.');
-                    return;
-                  }
-
-                  // Store form data and documents in localStorage for PremiumDashboard
-                  try {
-                    if (formData) {
-                      localStorage.setItem('annexa_premium_form_data', JSON.stringify(formData));
-                    }
-                    if (documents || socialBios || technicalFiles) {
-                      localStorage.setItem('annexa_premium_documents', JSON.stringify({
-                        documents: documents || {},
-                        socialBios: socialBios || null,
-                        technicalFiles: technicalFiles || null,
-                      }));
-                    }
-                  } catch (e) {
-                    console.warn('Failed to cache form data:', e);
-                  }
-
-                  try {
-                    const response = await base44.functions.invoke('createCheckoutSession', {
-                      returnUrl: window.location.origin,
-                      userWebsiteURL: formData?.website_url || '',
-                      businessName: formData?.company_name || '',
-                      productDescription: formData?.product_description || '',
-                      email: formData?.contact_email || '',
-                    });
-
-                    if (response.data.success && response.data.checkoutUrl) {
-                      window.location.href = response.data.checkoutUrl;
-                    } else {
-                      throw new Error(response.data.error || 'Failed to create checkout');
-                    }
-                  } catch (err) {
-                    console.error('Checkout error:', err);
-                    alert('Failed to start checkout. Please try again.');
-                  }
-                }}
-                className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12"
-              >
+              <Button onClick={onUpgrade} className="w-full bg-[#C24516] hover:bg-[#a33912] text-white h-12">
                 Upgrade to EDGE ($19)
               </Button>
               <Button onClick={onDownloadFree} variant="ghost" className="w-full text-zinc-400 hover:text-white text-sm">
