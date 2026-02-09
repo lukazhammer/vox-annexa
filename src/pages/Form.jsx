@@ -13,7 +13,6 @@ import CharacterBudget from '@/components/CharacterBudget';
 import UpsellModal from '@/components/UpsellModal';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import AIRefiner from '@/components/AIRefiner';
-import AIRefineButton from '@/components/AIRefineButton';
 import DraftModal from '@/components/DraftModal';
 import LegalBanner from '@/components/LegalBanner';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -885,15 +884,6 @@ export default function Form() {
                     onSelect={(refinement) => handleChange('product_description', refinement)}
                     fieldName="product_description"
                   />
-                  <AIRefineButton
-                    fieldName="product_description"
-                    currentValue={formData.product_description}
-                    context={{
-                      crawledData: scanResults?.prefilled,
-                      formData,
-                    }}
-                    onSelect={(refinedValue) => handleChange('product_description', refinedValue)}
-                  />
                   <CharacterBudget value={formData.product_description} min={50} ideal={150} />
                 </div>
 
@@ -1081,12 +1071,6 @@ export default function Form() {
                           placeholder="How do you want to be perceived? What makes you different from alternatives?"
                           rows={3}
                         />
-                        <AIRefineButton
-                          fieldName="brand_positioning"
-                          currentValue={formData.brand_positioning}
-                          context={{ crawledData: scanResults?.prefilled, formData }}
-                          onSelect={(v) => handleChange('brand_positioning', v)}
-                        />
                       </div>
 
                       <div>
@@ -1108,12 +1092,6 @@ export default function Form() {
                           placeholder="What frustrates your users about current alternatives?"
                           rows={3}
                         />
-                        <AIRefineButton
-                          fieldName="target_pain_points"
-                          currentValue={formData.target_pain_points}
-                          context={{ crawledData: scanResults?.prefilled, formData }}
-                          onSelect={(v) => handleChange('target_pain_points', v)}
-                        />
                       </div>
 
                       <div>
@@ -1124,12 +1102,6 @@ export default function Form() {
                           className="bg-zinc-900 border-zinc-800 text-white text-base min-h-[100px]"
                           placeholder="- Real-time collaboration&#10;- Built-in version control&#10;- API integrations"
                           rows={4}
-                        />
-                        <AIRefineButton
-                          fieldName="core_features"
-                          currentValue={formData.core_features}
-                          context={{ crawledData: scanResults?.prefilled, formData }}
-                          onSelect={(v) => handleChange('core_features', v)}
                         />
                       </div>
 
