@@ -7,7 +7,7 @@ import { Download, Edit, CheckCircle, Mail } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import SocialBios from '@/components/SocialBios';
 import TierDebugPanel from '@/components/TierDebugPanel';
-import { getUserTier, getTierFeatures } from '@/lib/tierUtils';
+import { getUserTier } from '@/lib/tierUtils';
 
 export default function Preview() {
   const location = useLocation();
@@ -20,7 +20,6 @@ export default function Preview() {
   // Use persistent tier from localStorage (survives page refresh)
   // Falls back to navigation state, then 'free'
   const tier = getUserTier() || location.state?.tier || 'free';
-  const tierFeatures = getTierFeatures(tier);
 
   // Combine documents with technical files for display
   const documents = {
@@ -162,7 +161,7 @@ export default function Preview() {
 
       <div className="flex gap-4 mb-12">
         <Button
-          onClick={() => downloadAll(true)}
+          onClick={() => downloadAll(tier === 'free')}
           className="bg-[#C24516] hover:bg-[#a33912] text-white"
         >
           <Download className="w-4 h-4 mr-2" />
@@ -228,7 +227,7 @@ export default function Preview() {
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-2xl font-bold">{selectedDoc}</h3>
               <Button
-                onClick={() => downloadDocument(selectedDoc, documents[selectedDoc])}
+                onClick={() => downloadDocument(selectedDoc, documents[selectedDoc], tier === 'free')}
                 variant="outline"
                 size="sm"
                 className="bg-zinc-900 border-[#C24516] text-[#C24516] hover:bg-[#C24516] hover:text-white"
@@ -274,30 +273,13 @@ export default function Preview() {
                 </div>
               </div>
 
-              {tier !== 'premium' ? (
-                <div className="border-2 border-[#C24516] rounded-lg p-6 bg-zinc-900">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-bold text-lg">Clean Export</h4>
-                      <p className="text-zinc-400 text-sm">Professional documents with no branding</p>
-                    </div>
-                    <span className="text-2xl font-bold text-[#C24516]">$29</span>
-                  </div>
-                  <Button
-                    onClick={() => alert('Payment integration coming soon!')}
-                    className="w-full mt-4 bg-[#C24516] hover:bg-[#a33912] text-white"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Upgrade to Premium ($29)
-                  </Button>
-                </div>
-              ) : (
+              {tier === 'premium' && (
                 <div className="border-2 border-green-500/50 rounded-lg p-6 bg-zinc-900">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h4 className="font-bold text-lg flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-green-500" />
-                        Premium Export
+                        Export Included
                       </h4>
                       <p className="text-zinc-400 text-sm">Professional documents with no branding</p>
                     </div>
@@ -308,7 +290,7 @@ export default function Preview() {
                     className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Download Clean Export
+                    Download ZIP Without Branding
                   </Button>
                 </div>
               )}
