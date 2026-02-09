@@ -63,12 +63,12 @@ export default function Home() {
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="https://your-website.com"
-                className="flex-1 px-6 py-4 text-lg border-2 border-[rgba(250,247,242,0.15)] rounded-lg bg-[#09090B] text-[#faf7f2] focus:border-[#C24516] focus:outline-none transition-colors placeholder:text-[rgba(250,247,242,0.3)]"
+                className="flex-1 px-6 py-4 text-lg border-2 border-[rgba(250,247,242,0.15)] rounded-lg bg-[#09090B] text-[#faf7f2] focus:border-[var(--app-accent)] focus:outline-none transition-colors placeholder:text-[rgba(250,247,242,0.3)]"
               />
               <button
                 onClick={() => handleStart()}
                 disabled={isValidating}
-                className="px-8 py-4 bg-[#C24516] text-white rounded-lg text-lg font-medium hover:bg-[#A03814] disabled:opacity-50 transition-colors whitespace-nowrap"
+                className="px-8 py-4 bg-[var(--app-accent)] text-white rounded-lg text-lg font-medium hover:brightness-90 disabled:opacity-50 transition-colors whitespace-nowrap"
               >
                 {isValidating ? 'Validating...' : 'Start free'}
               </button>
@@ -81,7 +81,7 @@ export default function Home() {
 
           {/* Visual Proof: Radar Chart Teaser */}
           <div className="relative max-w-3xl mx-auto">
-            <div className="relative rounded-xl overflow-hidden border-2 border-[rgba(194,69,22,0.2)]">
+            <div className="relative rounded-xl overflow-hidden border-2 border-[var(--app-accent)]/20">
               <div className="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-transparent z-10 pointer-events-none"></div>
 
               {/* Mock radar chart SVG */}
@@ -108,7 +108,7 @@ export default function Home() {
 
               {/* Overlay card */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="bg-[#09090B]/95 backdrop-blur-sm border-2 border-[#C24516] rounded-xl px-8 py-6 max-w-md mx-4 shadow-2xl">
+                <div className="bg-[#09090B]/95 backdrop-blur-sm border-2 border-[var(--app-accent)] rounded-xl px-8 py-6 max-w-md mx-4 shadow-2xl">
                   <h3 className="text-2xl mb-3 text-[#faf7f2]">
                     See where you stand
                   </h3>
@@ -118,7 +118,7 @@ export default function Home() {
                   </p>
                   <div className="flex items-center gap-3 text-sm">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-[#C24516]"></div>
+                      <div className="w-3 h-3 rounded-full bg-[var(--app-accent)]"></div>
                       <span className="text-[rgba(250,247,242,0.5)]">You</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ export default function Home() {
                   { title: 'SEO files', desc: 'robots.txt, sitemap.xml, llms.txt' },
                 ].map((item, i) => (
                   <li key={i} className="flex gap-3">
-                    <span className="text-[#C24516] text-xl flex-shrink-0">&#10003;</span>
+                    <span className="text-[var(--app-accent)] text-xl flex-shrink-0">&#10003;</span>
                     <div>
                       <div className="font-medium text-[#faf7f2]">{item.title}</div>
                       <div className="text-sm text-[rgba(250,247,242,0.5)]">{item.desc}</div>
@@ -172,7 +172,7 @@ export default function Home() {
 
               <button
                 onClick={() => navigate('/URLCapture')}
-                className="w-full border-2 border-[#C24516] text-[#C24516] px-6 py-3 rounded-lg font-medium hover:bg-[#C24516]/5 transition-colors"
+                className="w-full border-2 border-[var(--app-accent)] text-[var(--app-accent)] px-6 py-3 rounded-lg font-medium hover:bg-[var(--app-accent)]/5 transition-colors"
               >
                 Start free
               </button>
@@ -183,8 +183,8 @@ export default function Home() {
             </div>
 
             {/* Premium Tier */}
-            <div className="border-2 border-[#C24516] rounded-xl p-8 relative bg-[#C24516]/5">
-              <div className="absolute -top-3 left-8 bg-[#C24516] text-white text-xs font-medium px-3 py-1 rounded">
+            <div className="border-2 border-[var(--app-accent)] rounded-xl p-8 relative bg-[var(--app-accent)]/5">
+              <div className="absolute -top-3 left-8 bg-[var(--app-accent)] text-white text-xs font-medium px-3 py-1 rounded">
                 Most builders choose this
               </div>
 
@@ -207,7 +207,7 @@ export default function Home() {
                   { icon: '★', title: 'Export radar as PNG/PDF', desc: 'Share with investors, team' },
                 ].map((item, i) => (
                   <li key={i} className="flex gap-3">
-                    <span className="text-[#C24516] text-xl flex-shrink-0">{item.icon}</span>
+                    <span className="text-[var(--app-accent)] text-xl flex-shrink-0">{item.icon}</span>
                     <div>
                       <div className="font-medium text-[#faf7f2]">{item.title}</div>
                       <div className="text-sm text-[rgba(250,247,242,0.5)]">{item.desc}</div>
@@ -218,12 +218,12 @@ export default function Home() {
 
               <button
                 onClick={() => navigate('/URLCapture', { state: { premium: true } })}
-                className="w-full bg-[#C24516] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#A03814] transition-colors"
+                className="w-full bg-[var(--app-accent)] text-white px-6 py-3 rounded-lg font-medium hover:brightness-90 transition-colors"
               >
                 Start with Premium
               </button>
 
-              <p className="text-xs text-center mt-4 text-[#C24516]">
+              <p className="text-xs text-center mt-4 text-[var(--app-accent)]">
                 VIP access to competitive intelligence
               </p>
             </div>
@@ -245,26 +245,26 @@ export default function Home() {
           <div className="space-y-16">
             {/* Step 1 */}
             <div className="flex gap-6">
-              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>01</div>
+              <div className="mono-accent text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12">01</div>
               <div className="flex-1">
                 <h3 className="text-2xl mb-3 text-[#faf7f2]">Paste competitor URL</h3>
                 <p className="text-[rgba(250,247,242,0.6)] mb-4">
                   We crawl their website. Extract messaging, positioning, features, pricing strategy.
                   Takes 10-20 seconds depending on site size.
                 </p>
-                <div className="bg-[#1a1a1c] border border-[rgba(250,247,242,0.1)] rounded-lg p-4 text-sm" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                <div className="bg-[#1a1a1c] border border-[rgba(250,247,242,0.1)] rounded-lg p-4 text-sm mono-accent">
                   <div className="flex items-center gap-2">
                     <span className="text-[rgba(250,247,242,0.4)]">$</span>
                     <span className="text-[#faf7f2]">crawl https://asana.com</span>
                   </div>
-                  <div className="text-[#C24516] mt-2">&#8594; Analyzing... Extracted positioning</div>
+                  <div className="text-[var(--app-accent)] mt-2">&#8594; Analyzing... Extracted positioning</div>
                 </div>
               </div>
             </div>
 
             {/* Step 2 */}
             <div className="flex gap-6">
-              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>02</div>
+              <div className="mono-accent text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12">02</div>
               <div className="flex-1">
                 <h3 className="text-2xl mb-3 text-[#faf7f2]">AI generates competitive dimensions</h3>
                 <p className="text-[rgba(250,247,242,0.6)] mb-4">
@@ -283,7 +283,7 @@ export default function Home() {
                     'Performance'
                   ].map((axis, i) => (
                     <div key={i} className="flex items-center gap-2 bg-[#1a1a1c] rounded px-3 py-2">
-                      <span className="text-[#C24516]">&#8594;</span>
+                      <span className="text-[var(--app-accent)]">&#8594;</span>
                       <span className="text-[#faf7f2]">{axis}</span>
                     </div>
                   ))}
@@ -293,7 +293,7 @@ export default function Home() {
 
             {/* Step 3 */}
             <div className="flex gap-6">
-              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>03</div>
+              <div className="mono-accent text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12">03</div>
               <div className="flex-1">
                 <h3 className="text-2xl mb-3 text-[#faf7f2]">See positioning gaps</h3>
                 <p className="text-[rgba(250,247,242,0.6)] mb-4">
@@ -303,7 +303,7 @@ export default function Home() {
                 <div className="bg-[#1a1a1c] border border-[rgba(250,247,242,0.1)] rounded-lg p-6">
                   <div className="flex items-center justify-center gap-8 text-sm mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-[#C24516]"></div>
+                      <div className="w-4 h-4 rounded-full bg-[var(--app-accent)]"></div>
                       <span className="text-[#faf7f2]">Your Product</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export default function Home() {
 
             {/* Step 4 */}
             <div className="flex gap-6">
-              <div className="text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12" style={{ fontFamily: 'JetBrains Mono, monospace' }}>04</div>
+              <div className="mono-accent text-3xl text-[rgba(250,247,242,0.3)] flex-shrink-0 w-12">04</div>
               <div className="flex-1">
                 <h3 className="text-2xl mb-3 text-[#faf7f2]">Add differentiators, watch updates</h3>
                 <p className="text-[rgba(250,247,242,0.6)] mb-4">
@@ -329,14 +329,14 @@ export default function Home() {
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 bg-[#1a1a1c] rounded-lg p-3 text-sm">
-                    <span className="text-[#C24516]">+</span>
+                    <span className="text-[var(--app-accent)]">+</span>
                     <span className="text-[#faf7f2]">10x faster onboarding than Asana</span>
-                    <span className="ml-auto text-xs text-[#C24516]">Chart updated</span>
+                    <span className="ml-auto text-xs text-[var(--app-accent)]">Chart updated</span>
                   </div>
                   <div className="flex items-center gap-3 bg-[#1a1a1c] rounded-lg p-3 text-sm">
-                    <span className="text-[#C24516]">+</span>
+                    <span className="text-[var(--app-accent)]">+</span>
                     <span className="text-[#faf7f2]">Built for solo devs, not enterprises</span>
-                    <span className="ml-auto text-xs text-[#C24516]">Chart updated</span>
+                    <span className="ml-auto text-xs text-[var(--app-accent)]">Chart updated</span>
                   </div>
                   <div className="w-full border-2 border-dashed border-[rgba(250,247,242,0.12)] rounded-lg p-3 text-sm text-[rgba(250,247,242,0.4)]">
                     + Add another differentiator
@@ -349,7 +349,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 bg-[#C24516] text-white">
+      <section className="py-24 bg-[var(--app-accent)] text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-4xl mb-6">
             Legal docs that help you win
@@ -372,7 +372,7 @@ export default function Home() {
               />
               <button
                 onClick={() => handleStart(bottomUrl)}
-                className="px-8 py-4 bg-white text-[#C24516] rounded-lg font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-8 py-4 bg-white text-[var(--app-accent)] rounded-lg font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
               >
                 Start free
               </button>
@@ -397,7 +397,7 @@ export default function Home() {
             href="https://vox-animus.com/demo"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[#C24516] hover:brightness-110 hover:underline transition-all duration-150"
+            className="inline-flex items-center gap-1 text-[var(--app-accent)] hover:brightness-110 hover:underline transition-all duration-150"
           >
             See how it works &#8594;
           </a>

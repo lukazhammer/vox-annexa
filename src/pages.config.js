@@ -52,9 +52,10 @@ import AnnexaPrivacy from './pages/AnnexaPrivacy';
 import AnnexaTerms from './pages/AnnexaTerms';
 import DataRequest from './pages/DataRequest';
 import Form from './pages/Form';
-import Home from './pages/Home';
 import Preview from './pages/Preview';
 import URLCapture from './pages/URLCapture';
+import CompetitiveResults from './pages/CompetitiveResults';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -64,9 +65,10 @@ export const PAGES = {
     "AnnexaTerms": AnnexaTerms,
     "DataRequest": DataRequest,
     "Form": Form,
-    "Home": Home,
     "Preview": Preview,
     "URLCapture": URLCapture,
+    "CompetitiveResults": CompetitiveResults,
+    "Home": Home,
 }
 
 export const pagesConfig = {
