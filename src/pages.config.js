@@ -50,12 +50,14 @@
 import AnnexaCookies from './pages/AnnexaCookies';
 import AnnexaPrivacy from './pages/AnnexaPrivacy';
 import AnnexaTerms from './pages/AnnexaTerms';
+import CompetitiveResults from './pages/CompetitiveResults';
 import DataRequest from './pages/DataRequest';
 import Form from './pages/Form';
+import Home from './pages/Home';
+import PremiumBuilder from './pages/PremiumBuilder';
+import PremiumDashboard from './pages/PremiumDashboard';
 import Preview from './pages/Preview';
 import URLCapture from './pages/URLCapture';
-import CompetitiveResults from './pages/CompetitiveResults';
-import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -63,12 +65,14 @@ export const PAGES = {
     "AnnexaCookies": AnnexaCookies,
     "AnnexaPrivacy": AnnexaPrivacy,
     "AnnexaTerms": AnnexaTerms,
+    "CompetitiveResults": CompetitiveResults,
     "DataRequest": DataRequest,
     "Form": Form,
+    "Home": Home,
+    "PremiumBuilder": PremiumBuilder,
+    "PremiumDashboard": PremiumDashboard,
     "Preview": Preview,
     "URLCapture": URLCapture,
-    "CompetitiveResults": CompetitiveResults,
-    "Home": Home,
 }
 
 export const pagesConfig = {
