@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const bottlenecks = [
     {
@@ -33,7 +34,7 @@ export function BottleneckSelector() {
     const navigate = useNavigate();
 
     const handleSelect = (bottleneckId) => {
-        navigate(`/growth?bottleneck=${bottleneckId}`);
+        navigate(createPageUrl('Growth') + `?bottleneck=${bottleneckId}`);
     };
 
     return (
