@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 
-export default function Layout({ children }) {
+export default function Layout({ children, currentPageName }) {
   const [jurisdiction, setJurisdiction] = useState(null);
 
   useEffect(() => {
@@ -17,6 +17,53 @@ export default function Layout({ children }) {
     };
     detectUserLocation();
   }, []);
+
+  // Home page has its own nav/footer - render without layout wrapper
+  if (currentPageName === 'Home') {
+    return (
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&family=Poppins:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+          :root {
+            --background: #faf7f2;
+            --surface: #f5f0ea;
+            --card: #ffffff;
+            --accent: #A03814;
+            --text: #1a1a1a;
+            --text-muted: rgba(26, 26, 26, 0.7);
+            --border: rgba(26, 26, 26, 0.12);
+            --border-strong: rgba(26, 26, 26, 0.2);
+            --success: #5a8952;
+            --font-headline: 'Caudex', serif;
+            --font-body: 'Poppins', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+          }
+
+          body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #faf7f2;
+            color: #1a1a1a;
+          }
+
+          .font-headline {
+            font-family: 'Caudex', serif;
+          }
+
+          .font-body {
+            font-family: 'Poppins', sans-serif;
+          }
+
+          .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+          }
+        `}</style>
+        {children}
+      </>
+    );
+  }
+
+  // Other pages use the dark mode layout with header/footer
   return (
     <div className="min-h-screen bg-[#09090B] text-white">
       <style>{`

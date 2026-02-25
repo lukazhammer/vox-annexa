@@ -41,23 +41,23 @@ export function BottleneckSelector() {
             {bottlenecks.map((b) => (
                 <Card
                     key={b.id}
-                    className="bg-[var(--card)] border-[var(--border)] hover:border-[var(--border-strong)] transition-colors duration-150 cursor-pointer group"
+                    className="bg-white border-[rgba(26,26,26,0.12)] hover:border-[rgba(26,26,26,0.2)] transition-colors duration-150 cursor-pointer group"
                     onClick={() => handleSelect(b.id)}
                 >
                     <CardContent className="p-6">
-                        <p className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] mb-2">
+                        <p className="font-mono text-xs uppercase tracking-wider text-[rgba(26,26,26,0.7)] mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                             {b.title}
                         </p>
-                        <p className="font-body text-base text-[var(--text)] mb-3">
+                        <p className="text-base text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
                             {b.description}
                         </p>
-                        <p className="font-body text-sm text-[var(--text-muted)] italic mb-4">
+                        <p className="text-sm text-[rgba(26,26,26,0.7)] italic mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
                             {b.symptom}
                         </p>
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[var(--accent)] hover:text-[var(--accent)] hover:bg-transparent group-hover:translate-x-1 transition-transform duration-150 px-0"
+                            className="text-[#A03814] hover:text-[#A03814] hover:bg-transparent group-hover:translate-x-1 transition-transform duration-150 px-0"
                         >
                             Start →
                         </Button>
