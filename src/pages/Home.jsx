@@ -141,7 +141,7 @@ export default function Home() {
                                 Run the experiment
                             </h3>
                             <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                Copy the variant. Paste it into your site. Implementation prompt ready for Bolt, Cursor, or Lovable. Wait 7 days.
+                                Copy the variant. Paste it into your site. Implementation prompt ready for Bolt, Base44, or Lovable. Wait 7 days.
                             </p>
                         </div>
                         <div>
