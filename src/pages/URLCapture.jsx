@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, Loader2, Check, Globe, FileText, Mail, Shield, BarChart3 } from 'lucide-react';
@@ -11,6 +11,19 @@ const CRAWL_STEPS = [
   { key: 'detecting', label: 'Detecting data collection practices' },
   { key: 'analyzing', label: 'Analyzing legal compliance' },
 ];
+
+const BOTTLENECK_LABELS = {
+  acquisition: 'Acquisition',
+  activation: 'Activation',
+  retention: 'Retention',
+  referral: 'Referral',
+};
+
+const TIER_LABELS = {
+  scout: 'Scout',
+  growth: 'Growth',
+  velocity: 'Velocity',
+};
 
 function isValidURL(input) {
   try {
@@ -27,11 +40,34 @@ function isValidURL(input) {
 
 export default function URLCapture() {
   const navigate = useNavigate();
-  const [url, setUrl] = useState('');
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const flow = location.state?.flow || query.get('flow') || '';
+  const bottleneck = location.state?.bottleneck || query.get('bottleneck') || '';
+  const tier = location.state?.tier || query.get('tier') || '';
+  const prefillUrl = location.state?.prefillUrl || '';
+  const hasGrowthSprintContext = flow === 'growth-sprint' || Boolean(bottleneck) || Boolean(tier);
+  const resolvedTier = TIER_LABELS[tier] ? tier : 'scout';
+  const growthSprintContext = hasGrowthSprintContext
+    ? {
+      source: 'landing-v2',
+      flow: 'growth-sprint',
+      bottleneck: bottleneck || null,
+      tier: resolvedTier,
+    }
+    : null;
+
+  const [url, setUrl] = useState(() => prefillUrl || localStorage.getItem('userWebsiteURL') || '');
   const [crawlStatus, setCrawlStatus] = useState('idle');
   const [crawlStep, setCrawlStep] = useState(0);
   const [error, setError] = useState(null);
   const [crawlResults, setCrawlResults] = useState(null);
+
+  useEffect(() => {
+    if (prefillUrl) {
+      setUrl(prefillUrl);
+    }
+  }, [prefillUrl]);
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
@@ -68,6 +104,11 @@ export default function URLCapture() {
       // Store crawled data for Form.jsx to use
       localStorage.setItem('crawledWebsiteData', JSON.stringify(data));
       localStorage.setItem('userWebsiteURL', trimmedUrl);
+      if (growthSprintContext) {
+        localStorage.setItem('annexa_growth_sprint_context', JSON.stringify(growthSprintContext));
+      } else {
+        localStorage.removeItem('annexa_growth_sprint_context');
+      }
 
       setCrawlResults(data);
       setCrawlStatus('complete');
@@ -79,6 +120,7 @@ export default function URLCapture() {
             scanResults: data,
             websiteUrl: trimmedUrl,
             crawledData: data,
+            growthSprintContext,
           },
         });
       }, 800);
@@ -91,7 +133,12 @@ export default function URLCapture() {
   const handleSkipToManual = () => {
     localStorage.removeItem('crawledWebsiteData');
     localStorage.removeItem('userWebsiteURL');
-    navigate('/Form', { state: { manualEntry: true } });
+    if (growthSprintContext) {
+      localStorage.setItem('annexa_growth_sprint_context', JSON.stringify(growthSprintContext));
+    } else {
+      localStorage.removeItem('annexa_growth_sprint_context');
+    }
+    navigate('/Form', { state: { manualEntry: true, growthSprintContext } });
   };
 
   const handleKeyDown = (e) => {
@@ -103,6 +150,15 @@ export default function URLCapture() {
   return (
     <div className="py-20">
       <div className="max-w-[640px] mx-auto px-6">
+        {growthSprintContext && (
+          <div className="mb-6 rounded-lg border border-[#C24516]/35 bg-[#C24516]/10 p-4 text-sm text-[#f7d8cb]">
+            <p className="font-medium text-[#f8e4db]">Growth Sprint intake</p>
+            <p className="mt-1">
+              Track: {BOTTLENECK_LABELS[bottleneck] || 'General'} • Plan: {TIER_LABELS[resolvedTier]}
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-10">
           <h2 className="text-[40px] md:text-[36px] sm:text-[28px] font-bold mb-4 text-[#faf7f2] leading-tight">

@@ -21,12 +21,42 @@ import JurisdictionNotice from '@/components/JurisdictionNotice';
 import CompetitiveIntelligence from '@/components/CompetitiveIntelligence';
 import { upgradeToEdge, getUserTier } from '@/lib/tierUtils';
 
+const GROWTH_BOTTLENECK_LABELS = {
+  acquisition: 'Acquisition',
+  activation: 'Activation',
+  retention: 'Retention',
+  referral: 'Referral',
+};
+
+const GROWTH_TIER_LABELS = {
+  scout: 'Scout',
+  growth: 'Growth',
+  velocity: 'Velocity',
+};
+
+const GROWTH_BOTTLENECK_HINTS = {
+  acquisition: 'Traffic is reaching us, but signup conversion is low.',
+  activation: 'Signups are happening, but users do not reach the first win.',
+  retention: 'Users start, then stop returning after initial use.',
+  referral: 'Current users are satisfied, but referrals are low.',
+};
+
 export default function Form() {
   const navigate = useNavigate();
   const location = useLocation();
   const scanResults = location.state?.scanResults;
   const websiteUrl = location.state?.websiteUrl;
   const existingData = location.state?.formData;
+  const storedGrowthContext = (() => {
+    try {
+      const raw = localStorage.getItem('annexa_growth_sprint_context');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const growthSprintContext = location.state?.growthSprintContext || storedGrowthContext;
+  const selectedGrowthTier = GROWTH_TIER_LABELS[growthSprintContext?.tier] ? growthSprintContext.tier : 'scout';
 
   const [formData, setFormData] = useState({
     company_name: '',
@@ -211,6 +241,19 @@ export default function Form() {
 
     return () => clearTimeout(timer);
   }, [formData.company_name, formData.product_description]);
+
+  useEffect(() => {
+    const bottleneck = growthSprintContext?.bottleneck;
+    if (!bottleneck || formData.target_pain_points) return;
+
+    const hint = GROWTH_BOTTLENECK_HINTS[bottleneck];
+    if (!hint) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      target_pain_points: hint,
+    }));
+  }, [growthSprintContext?.bottleneck, formData.target_pain_points]);
 
   useEffect(() => {
     // Exit intent detection - only after user has made real progress
@@ -658,6 +701,16 @@ export default function Form() {
       <LegalBanner />
 
       <JurisdictionNotice jurisdiction={jurisdiction} country={detectedCountry} />
+
+      {growthSprintContext && (
+        <div className="mb-6 rounded-lg border border-[#C24516]/35 bg-[#C24516]/10 p-4 text-sm text-[#f7d8cb]">
+          <p className="font-semibold text-[#f8e4db]">Growth Sprint mode</p>
+          <p className="mt-1">
+            Bottleneck: {GROWTH_BOTTLENECK_LABELS[growthSprintContext?.bottleneck] || 'General'} • Plan:{' '}
+            {GROWTH_TIER_LABELS[selectedGrowthTier]}
+          </p>
+        </div>
+      )}
 
       {/* Progress Indicator */}
       <div className="mb-6 sm:mb-8">
