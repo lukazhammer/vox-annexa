@@ -58,6 +58,7 @@ import PremiumBuilder from './pages/PremiumBuilder';
 import PremiumDashboard from './pages/PremiumDashboard';
 import Preview from './pages/Preview';
 import URLCapture from './pages/URLCapture';
+import Growth from './pages/Growth';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +74,7 @@ export const PAGES = {
     "PremiumDashboard": PremiumDashboard,
     "Preview": Preview,
     "URLCapture": URLCapture,
+    "Growth": Growth,
 }
 
 export const pagesConfig = {
