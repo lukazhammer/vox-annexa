@@ -51,8 +51,8 @@ Deno.serve(async (req) => {
                     quantity: 1,
                 },
             ],
-            success_url: `${req.headers.get('origin')}/Growth?payment=success&tier=${tier}`,
-            cancel_url: `${req.headers.get('origin')}/#pricing`,
+            success_url: `${req.headers.get('origin') || 'https://annexa.base44.app'}/Growth?payment=success&tier=${tier}`,
+            cancel_url: `${req.headers.get('origin') || 'https://annexa.base44.app'}/#pricing`,
             metadata: {
                 base44_app_id: Deno.env.get('BASE44_APP_ID'),
                 user_email: user.email,
