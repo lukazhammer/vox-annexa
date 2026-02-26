@@ -50,8 +50,37 @@ const tiers = [
     },
 ];
 
+import { useEffect } from 'react';
+
 export function PricingTiers() {
     const [loading, setLoading] = useState(null);
+
+    // Check for pending checkout after login redirect
+    useEffect(() => {
+        const checkPendingCheckout = async () => {
+            const pendingTier = localStorage.getItem('pending_checkout_tier');
+            if (pendingTier) {
+                localStorage.removeItem('pending_checkout_tier');
+                
+                const isAuthenticated = await base44.auth.isAuthenticated();
+                if (isAuthenticated) {
+                    setLoading(pendingTier);
+                    try {
+                        const response = await base44.functions.invoke('createPricingCheckout', { tier: pendingTier });
+                        if (response.data?.url) {
+                            window.location.href = response.data.url;
+                        }
+                    } catch (error) {
+                        console.error('Checkout error:', error);
+                    } finally {
+                        setLoading(null);
+                    }
+                }
+            }
+        };
+        
+        checkPendingCheckout();
+    }, []);
 
     const handlePurchase = async (tierName) => {
         // Check if running in iframe
@@ -71,6 +100,16 @@ export function PricingTiers() {
         setLoading(tierKey);
         
         try {
+            // Check if user is authenticated first
+            const isAuthenticated = await base44.auth.isAuthenticated();
+            
+            if (!isAuthenticated) {
+                // Store the tier they want to purchase, then redirect to login
+                localStorage.setItem('pending_checkout_tier', tierKey);
+                base44.auth.redirectToLogin(window.location.origin + '/#pricing');
+                return;
+            }
+
             const response = await base44.functions.invoke('createPricingCheckout', { tier: tierKey });
             if (response.data?.url) {
                 window.location.href = response.data.url;
@@ -79,8 +118,7 @@ export function PricingTiers() {
             }
         } catch (error) {
             console.error('Checkout error:', error);
-            // User might not be logged in
-            base44.auth.redirectToLogin(window.location.href);
+            alert('Something went wrong. Please try again.');
         } finally {
             setLoading(null);
         }
