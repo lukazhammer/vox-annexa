@@ -94,8 +94,31 @@ export default function Growth() {
         const { diagnosis, experiment, nextMoves, experimentId } = sprintData;
 
         return (
-            <div className="min-h-screen bg-[#faf7f2] px-6 py-12">
-                <div className="max-w-3xl mx-auto">
+            <div className="min-h-screen bg-[#faf7f2]">
+                {/* Navigation */}
+                <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+                    <a href="/" className="text-2xl text-[#1a1a1a]" style={{ fontFamily: "'Caudex', serif" }}>
+                        Annexa<span className="text-[#A03814]">.</span>
+                    </a>
+                    <div className="flex items-center gap-6">
+                        <a
+                            href="/#demo"
+                            className="text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] transition-colors duration-150"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                            See it work
+                        </a>
+                        <a
+                            href="/#pricing"
+                            className="text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] transition-colors duration-150"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                            Pricing
+                        </a>
+                    </div>
+                </nav>
+
+                <div className="max-w-3xl mx-auto px-6 py-12">
                     {/* Back link */}
                     <Link
                         to={createPageUrl('Home')}
@@ -309,8 +332,31 @@ export default function Growth() {
     }
 
     return (
-        <div className="min-h-screen bg-[#faf7f2] px-6 py-12">
-            <div className="max-w-2xl mx-auto">
+        <div className="min-h-screen bg-[#faf7f2]">
+            {/* Navigation */}
+            <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+                <a href="/" className="text-2xl text-[#1a1a1a]" style={{ fontFamily: "'Caudex', serif" }}>
+                    Annexa<span className="text-[#A03814]">.</span>
+                </a>
+                <div className="flex items-center gap-6">
+                    <a
+                        href="/#demo"
+                        className="text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] transition-colors duration-150"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                        See it work
+                    </a>
+                    <a
+                        href="/#pricing"
+                        className="text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] transition-colors duration-150"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                        Pricing
+                    </a>
+                </div>
+            </nav>
+
+            <div className="max-w-2xl mx-auto px-6 py-12">
                 {/* Back link */}
                 <Link
                     to={createPageUrl('Home')}
