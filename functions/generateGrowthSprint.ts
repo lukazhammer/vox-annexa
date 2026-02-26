@@ -36,7 +36,11 @@ Rules:
 1. ONE experiment only — the most impactful given current state
 2. Hypothesis must be falsifiable
 3. Variant content must be copy-paste ready (actual text they can use)
-4. Implementation prompt must work in Bolt, Cursor, or Lovable
+4. Implementation prompt must be platform-agnostic (works in any AI coding tool). Format it like this:
+   - State what to change clearly (e.g., "Update the primary CTA button text on the signup page to: 'Your New Text'")
+   - Include specific requirements/constraints as bullet points (e.g., "Keep button styling unchanged", "Ensure visible on mobile and desktop")
+   - Do NOT mention any specific platform or tool by name (no "Use Bolt", "In Cursor", etc.)
+   - Include testing requirements (e.g., "Test that the button still links correctly")
 5. Success metric must be specific and measurable (numbers, not vague)
 6. Duration should be realistic (typically 7-14 days)
 7. Next moves should be specific actions based on each possible outcome`;

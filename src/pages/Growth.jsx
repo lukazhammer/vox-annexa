@@ -78,13 +78,20 @@ export default function Growth() {
     const CopyButton = ({ text, copyKey }) => (
         <button
             onClick={() => copyToClipboard(text, copyKey)}
-            className="p-1.5 rounded hover:bg-[rgba(26,26,26,0.05)] transition-colors"
+            className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors hover:bg-[rgba(26,26,26,0.05)] border border-[rgba(26,26,26,0.15)]"
             title="Copy to clipboard"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
         >
             {copied[copyKey] ? (
-                <Check className="w-4 h-4 text-[#5a8952]" />
+                <>
+                    <Check className="w-3.5 h-3.5 text-[#5a8952]" />
+                    <span className="text-[#5a8952]">Copied</span>
+                </>
             ) : (
-                <Copy className="w-4 h-4 text-[rgba(26,26,26,0.5)]" />
+                <>
+                    <Copy className="w-3.5 h-3.5 text-[rgba(26,26,26,0.6)]" />
+                    <span className="text-[rgba(26,26,26,0.6)]">Copy</span>
+                </>
             )}
         </button>
     );
@@ -119,15 +126,25 @@ export default function Growth() {
                 </nav>
 
                 <div className="max-w-3xl mx-auto px-6 py-12">
-                    {/* Back link */}
-                    <Link
-                        to={createPageUrl('Home')}
-                        className="inline-flex items-center text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] mb-8 transition-colors"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back to home
-                    </Link>
+                    {/* Top navigation */}
+                    <div className="flex items-center justify-between mb-8">
+                        <Link
+                            to={createPageUrl('Home')}
+                            className="inline-flex items-center text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] transition-colors"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            Back to home
+                        </Link>
+                        <Button
+                            onClick={() => setSprintData(null)}
+                            variant="outline"
+                            size="sm"
+                            className="border-[rgba(26,26,26,0.2)] text-[#1a1a1a]"
+                        >
+                            New sprint
+                        </Button>
+                    </div>
 
                     {/* Header */}
                     <div className="mb-8">
@@ -243,9 +260,6 @@ export default function Growth() {
                                     </button>
                                 </div>
                             </div>
-                            <p className="text-xs text-[rgba(26,26,26,0.5)] mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                Paste this into Base44, Bolt, Cursor, or Lovable
-                            </p>
                         </CardContent>
                     </Card>
 
@@ -303,7 +317,7 @@ export default function Growth() {
                     </Card>
 
                     {/* Report Results CTA */}
-                    <div className="bg-[#f5f0ea] rounded-lg p-6 mb-6 text-center">
+                    <div className="bg-[#f5f0ea] rounded-lg p-6 text-center">
                         <p className="text-sm text-[rgba(26,26,26,0.7)] mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
                             Run this experiment for {experiment.durationDays} days. When it's done, report your results to get your next sprint.
                         </p>
@@ -312,18 +326,6 @@ export default function Growth() {
                             className="bg-[#A03814] hover:bg-[#8a2f11] text-white px-8"
                         >
                             Report Results
-                        </Button>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-4">
-                        <Button
-                            onClick={() => setSprintData(null)}
-                            variant="outline"
-                            className="border-[rgba(26,26,26,0.2)] text-[#1a1a1a]"
-                        >
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            New sprint
                         </Button>
                     </div>
                 </div>
