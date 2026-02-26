@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
@@ -38,45 +39,252 @@ export default function Growth() {
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [currentSituation, setCurrentSituation] = useState('');
-    const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [sprintData, setSprintData] = useState(null);
+    const [copied, setCopied] = useState({});
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await base44.functions.invoke('generateGrowthSprint', {
+                productDescription: `${productName}: ${productDescription}`,
+                currentState: currentSituation,
+                bottleneck: bottleneckParam
+            });
+
+            if (response.data.success) {
+                setSprintData(response.data);
+            } else {
+                setError(response.data.error || 'Failed to generate sprint');
+            }
+        } catch (err) {
+            console.error('Sprint generation error:', err);
+            setError('Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    if (submitted) {
+    const copyToClipboard = (text, key) => {
+        navigator.clipboard.writeText(text);
+        setCopied({ ...copied, [key]: true });
+        setTimeout(() => setCopied({ ...copied, [key]: false }), 2000);
+    };
+
+    const CopyButton = ({ text, copyKey }) => (
+        <button
+            onClick={() => copyToClipboard(text, copyKey)}
+            className="p-1.5 rounded hover:bg-[rgba(26,26,26,0.05)] transition-colors"
+            title="Copy to clipboard"
+        >
+            {copied[copyKey] ? (
+                <Check className="w-4 h-4 text-[#5a8952]" />
+            ) : (
+                <Copy className="w-4 h-4 text-[rgba(26,26,26,0.5)]" />
+            )}
+        </button>
+    );
+
+    // Sprint results view
+    if (sprintData) {
+        const { diagnosis, experiment, nextMoves, experimentId } = sprintData;
+
         return (
             <div className="min-h-screen bg-[#faf7f2] px-6 py-12">
-                <div className="max-w-2xl mx-auto">
-                    <Card className="bg-white border-[rgba(26,26,26,0.12)]">
-                        <CardContent className="p-8 text-center">
-                            <p className="text-4xl mb-4">🚀</p>
-                            <h2 className="text-2xl text-[#1a1a1a] mb-4" style={{ fontFamily: "'Caudex', serif" }}>
-                                Sprint generation coming soon
-                            </h2>
-                            <p className="text-[rgba(26,26,26,0.7)] mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                We're building your {bottleneck.title.toLowerCase()} sprint for <strong>{productName}</strong>.
-                                This feature will be connected shortly.
-                            </p>
-                            <div className="bg-[#f5f0ea] rounded-lg p-4 text-left text-sm text-[rgba(26,26,26,0.7)] mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                <p className="font-semibold text-[#1a1a1a] mb-2">What you submitted:</p>
-                                <p><strong>Bottleneck:</strong> {bottleneck.title}</p>
-                                <p><strong>Product:</strong> {productName}</p>
-                                <p><strong>Description:</strong> {productDescription}</p>
-                                <p><strong>Current situation:</strong> {currentSituation}</p>
+                <div className="max-w-3xl mx-auto">
+                    {/* Back link */}
+                    <Link
+                        to={createPageUrl('Home')}
+                        className="inline-flex items-center text-sm text-[rgba(26,26,26,0.7)] hover:text-[#1a1a1a] mb-8 transition-colors"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back to home
+                    </Link>
+
+                    {/* Header */}
+                    <div className="mb-8">
+                        <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)] mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                            {experimentId}
+                        </p>
+                        <h1 className="text-3xl text-[#1a1a1a] mb-2" style={{ fontFamily: "'Caudex', serif" }}>
+                            {experiment.title}
+                        </h1>
+                        <p className="text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            {bottleneck.title} experiment • {experiment.durationDays} days
+                        </p>
+                    </div>
+
+                    {/* Diagnosis Card */}
+                    <Card className="bg-white border-[rgba(26,26,26,0.12)] mb-6">
+                        <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                                <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                    Diagnosis
+                                </p>
+                                <span className={`text-xs px-2 py-1 rounded ${
+                                    diagnosis.confidence === 'high' ? 'bg-[#5a8952]/10 text-[#5a8952]' :
+                                    diagnosis.confidence === 'medium' ? 'bg-[#A03814]/10 text-[#A03814]' :
+                                    'bg-[rgba(26,26,26,0.1)] text-[rgba(26,26,26,0.7)]'
+                                }`} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                    {diagnosis.confidence} confidence
+                                </span>
                             </div>
-                            <Link to={createPageUrl('Home')}>
-                                <Button
-                                    variant="outline"
-                                    className="border-[rgba(26,26,26,0.2)] text-[#1a1a1a]"
-                                >
-                                    <ArrowLeft className="w-4 h-4 mr-2" />
-                                    Back to home
-                                </Button>
-                            </Link>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-lg font-medium text-[#1a1a1a] mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                {diagnosis.primaryIssue}
+                            </p>
+                            <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                {diagnosis.reasoning}
+                            </p>
                         </CardContent>
                     </Card>
+
+                    {/* Hypothesis Card */}
+                    <Card className="bg-white border-[rgba(26,26,26,0.12)] mb-6">
+                        <CardHeader className="pb-2">
+                            <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                Hypothesis
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-start justify-between gap-4">
+                                <p className="text-[#1a1a1a] italic" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                    "{experiment.hypothesis}"
+                                </p>
+                                <CopyButton text={experiment.hypothesis} copyKey="hypothesis" />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Variant Card */}
+                    <Card className="bg-white border-[rgba(26,26,26,0.12)] mb-6">
+                        <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                                <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                    Your experiment
+                                </p>
+                                <span className="text-xs px-2 py-1 rounded bg-[#A03814]/10 text-[#A03814]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                    {experiment.variant.type}
+                                </span>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="bg-[#f5f0ea] rounded-lg p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                    <p className="text-[#1a1a1a] font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                        {experiment.variant.content}
+                                    </p>
+                                    <CopyButton text={experiment.variant.content} copyKey="variant" />
+                                </div>
+                            </div>
+                            <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                <span className="font-medium">Where to use:</span> {experiment.variant.context}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Implementation Prompt Card */}
+                    <Card className="bg-white border-[rgba(26,26,26,0.12)] mb-6">
+                        <CardHeader className="pb-2">
+                            <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                Implementation prompt
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="bg-[#1a1a1a] rounded-lg p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                    <pre className="text-sm text-[#faf7f2] whitespace-pre-wrap" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                        {experiment.implementationPrompt}
+                                    </pre>
+                                    <button
+                                        onClick={() => copyToClipboard(experiment.implementationPrompt, 'prompt')}
+                                        className="p-1.5 rounded hover:bg-[rgba(250,247,242,0.1)] transition-colors flex-shrink-0"
+                                        title="Copy to clipboard"
+                                    >
+                                        {copied.prompt ? (
+                                            <Check className="w-4 h-4 text-[#5a8952]" />
+                                        ) : (
+                                            <Copy className="w-4 h-4 text-[rgba(250,247,242,0.5)]" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                            <p className="text-xs text-[rgba(26,26,26,0.5)] mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                Paste this into Base44, Bolt, Cursor, or Lovable
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Success Metric Card */}
+                    <Card className="bg-white border-[rgba(26,26,26,0.12)] mb-6">
+                        <CardHeader className="pb-2">
+                            <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                Success metric
+                            </p>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="flex items-start justify-between gap-4">
+                                <p className="text-[#1a1a1a] font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                    {experiment.successMetric}
+                                </p>
+                                <CopyButton text={experiment.successMetric} copyKey="metric" />
+                            </div>
+                            <hr className="border-[rgba(26,26,26,0.08)]" />
+                            <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                <span className="font-medium">How to measure:</span> {experiment.measurementPlan}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Next Moves Card */}
+                    <Card className="bg-white border-[rgba(26,26,26,0.12)] mb-6">
+                        <CardHeader className="pb-2">
+                            <p className="text-xs uppercase tracking-wider text-[rgba(26,26,26,0.5)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                                What to do next
+                            </p>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-start gap-3">
+                                <span className="text-lg">📈</span>
+                                <div>
+                                    <p className="text-sm font-medium text-[#5a8952]" style={{ fontFamily: "'Poppins', sans-serif" }}>If improved</p>
+                                    <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>{nextMoves.ifImproved}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-lg">➡️</span>
+                                <div>
+                                    <p className="text-sm font-medium text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>If no change</p>
+                                    <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>{nextMoves.ifNoChange}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-lg">📉</span>
+                                <div>
+                                    <p className="text-sm font-medium text-[#A03814]" style={{ fontFamily: "'Poppins', sans-serif" }}>If worsened</p>
+                                    <p className="text-sm text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>{nextMoves.ifWorsened}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Actions */}
+                    <div className="flex gap-4">
+                        <Button
+                            onClick={() => setSprintData(null)}
+                            variant="outline"
+                            className="border-[rgba(26,26,26,0.2)] text-[#1a1a1a]"
+                        >
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            New sprint
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
@@ -126,6 +334,7 @@ export default function Growth() {
                                     onChange={(e) => setProductName(e.target.value)}
                                     placeholder="e.g. HabitFlow"
                                     required
+                                    disabled={loading}
                                     className="border-[rgba(26,26,26,0.2)] focus:border-[#A03814] focus:ring-[#A03814]"
                                 />
                             </div>
@@ -139,6 +348,7 @@ export default function Growth() {
                                     onChange={(e) => setProductDescription(e.target.value)}
                                     placeholder="e.g. A habit tracking app that helps people build daily routines through gentle reminders and streak tracking."
                                     required
+                                    disabled={loading}
                                     rows={3}
                                     className="border-[rgba(26,26,26,0.2)] focus:border-[#A03814] focus:ring-[#A03814]"
                                 />
@@ -153,16 +363,31 @@ export default function Growth() {
                                     onChange={(e) => setCurrentSituation(e.target.value)}
                                     placeholder={`e.g. We're getting about 100 signups per week but only 10% complete onboarding. Most drop off after the first screen.`}
                                     required
+                                    disabled={loading}
                                     rows={4}
                                     className="border-[rgba(26,26,26,0.2)] focus:border-[#A03814] focus:ring-[#A03814]"
                                 />
                             </div>
 
+                            {error && (
+                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                                    {error}
+                                </div>
+                            )}
+
                             <Button
                                 type="submit"
+                                disabled={loading}
                                 className="w-full bg-[#A03814] hover:bg-[#8a2f11] text-white"
                             >
-                                Generate my sprint
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Generating your sprint...
+                                    </>
+                                ) : (
+                                    'Generate my sprint'
+                                )}
                             </Button>
                         </form>
                     </CardContent>

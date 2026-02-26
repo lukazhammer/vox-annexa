@@ -53,12 +53,12 @@ import AnnexaTerms from './pages/AnnexaTerms';
 import CompetitiveResults from './pages/CompetitiveResults';
 import DataRequest from './pages/DataRequest';
 import Form from './pages/Form';
+import Growth from './pages/Growth';
 import Home from './pages/Home';
 import PremiumBuilder from './pages/PremiumBuilder';
 import PremiumDashboard from './pages/PremiumDashboard';
 import Preview from './pages/Preview';
 import URLCapture from './pages/URLCapture';
-import Growth from './pages/Growth';
 import __Layout from './Layout.jsx';
 
 
@@ -69,12 +69,12 @@ export const PAGES = {
     "CompetitiveResults": CompetitiveResults,
     "DataRequest": DataRequest,
     "Form": Form,
+    "Growth": Growth,
     "Home": Home,
     "PremiumBuilder": PremiumBuilder,
     "PremiumDashboard": PremiumDashboard,
     "Preview": Preview,
     "URLCapture": URLCapture,
-    "Growth": Growth,
 }
 
 export const pagesConfig = {
