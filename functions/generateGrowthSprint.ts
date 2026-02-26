@@ -23,12 +23,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid bottleneck type' }, { status: 400 });
     }
 
-    // Track request
     const startTime = Date.now();
-    base44.analytics.track({
-      eventName: 'growth_sprint_requested',
-      properties: { bottleneck }
-    });
 
     const prompt = `You are a growth advisor for indie SaaS products. You provide ONE focused experiment at a time.
 
@@ -103,16 +98,8 @@ Output ONLY valid JSON, no markdown, no code blocks, just JSON.`;
     // Generate experiment ID
     const experimentId = `exp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
-    // Track success
     const duration = Date.now() - startTime;
-    base44.analytics.track({
-      eventName: 'growth_sprint_generated',
-      properties: {
-        duration_ms: duration,
-        bottleneck,
-        experimentType: sprintData.experiment?.variant?.type
-      }
-    });
+    console.log(`Growth sprint generated in ${duration}ms for bottleneck: ${bottleneck}`);
 
     return Response.json({
       success: true,
@@ -122,12 +109,6 @@ Output ONLY valid JSON, no markdown, no code blocks, just JSON.`;
 
   } catch (error) {
     console.error('Growth sprint error:', error);
-
-    const base44 = createClientFromRequest(req);
-    base44.analytics.track({
-      eventName: 'growth_sprint_failed',
-      properties: { error: error.message }
-    });
 
     return Response.json({
       success: false,
