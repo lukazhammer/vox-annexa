@@ -18,8 +18,8 @@ export default function Layout({ children, currentPageName }) {
     detectUserLocation();
   }, []);
 
-  // Home page has its own nav/footer - render without layout wrapper
-  if (currentPageName === 'Home') {
+  // Home and Growth pages use light mode with their own nav
+  if (currentPageName === 'Home' || currentPageName === 'Growth') {
     return (
       <>
         <style>{`

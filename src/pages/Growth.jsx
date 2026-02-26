@@ -115,8 +115,13 @@ export default function Growth() {
                             {experiment.title}
                         </h1>
                         <p className="text-[rgba(26,26,26,0.7)]" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                            {bottleneck.title} experiment • {experiment.durationDays} days
+                            {bottleneck.title} experiment
                         </p>
+                        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-[#A03814]/10 rounded-full">
+                            <span className="text-sm text-[#A03814] font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                Run for {experiment.durationDays} days, then report results
+                            </span>
+                        </div>
                     </div>
 
                     {/* Diagnosis Card */}
@@ -273,6 +278,19 @@ export default function Growth() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* Report Results CTA */}
+                    <div className="bg-[#f5f0ea] rounded-lg p-6 mb-6 text-center">
+                        <p className="text-sm text-[rgba(26,26,26,0.7)] mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            Run this experiment for {experiment.durationDays} days. When it's done, report your results to get your next sprint.
+                        </p>
+                        <Button
+                            onClick={() => alert('Coming soon! Report results feature is under development.')}
+                            className="bg-[#A03814] hover:bg-[#8a2f11] text-white px-8"
+                        >
+                            Report Results
+                        </Button>
+                    </div>
 
                     {/* Actions */}
                     <div className="flex gap-4">
