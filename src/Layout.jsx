@@ -89,26 +89,27 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
       
       <header className="border-b border-[rgba(250,247,242,0.12)]">
-        <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="flex flex-col">
-            <h1 className="text-[40px] font-bold text-[#faf7f2] tracking-[0.08em] leading-none">
-              ANNEXA
-              <span className="text-[var(--app-accent)] text-[48px] leading-none align-baseline">.</span>
-            </h1>
-            <p className="text-lg text-[rgba(250,247,242,0.7)] mt-1">Legal boilerplate for builders</p>
-            <p className="mono-accent text-[11px] text-[rgba(250,247,242,0.4)] mt-3">
-              Free tool by{' '}
-              <a 
-                href="https://vox-animus.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-[rgba(250,247,242,0.5)] hover:text-[var(--app-accent)] transition-colors duration-150"
-              >
-                Vox Animus
-              </a>
-            </p>
+        <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+          <a href="/" className="text-2xl text-[#faf7f2]" style={{ fontFamily: "'Caudex', serif" }}>
+            Annexa<span className="text-[#C24516]">.</span>
+          </a>
+          <div className="flex items-center gap-6">
+            <a
+              href="/#demo"
+              className="text-sm text-[rgba(250,247,242,0.7)] hover:text-[#faf7f2] transition-colors duration-150"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              See it work
+            </a>
+            <a
+              href="/#pricing"
+              className="text-sm text-[rgba(250,247,242,0.7)] hover:text-[#faf7f2] transition-colors duration-150"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              Pricing
+            </a>
           </div>
-        </div>
+        </nav>
       </header>
 
       <main>
