@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { base44 } from '@/api/base44Client';
+import { Loader2 } from 'lucide-react';
+import { createPageUrl } from '@/utils';
 
 const tiers = [
     {
@@ -47,6 +51,41 @@ const tiers = [
 ];
 
 export function PricingTiers() {
+    const [loading, setLoading] = useState(null);
+
+    const handlePurchase = async (tierName) => {
+        // Check if running in iframe
+        if (window.self !== window.top) {
+            alert('Checkout works only from the published app. Please open the app in a new tab.');
+            return;
+        }
+
+        const tierKey = tierName.toLowerCase();
+        
+        if (tierKey === 'scout') {
+            // Free tier - redirect to selector
+            document.getElementById('selector')?.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
+        setLoading(tierKey);
+        
+        try {
+            const response = await base44.functions.invoke('createPricingCheckout', { tier: tierKey });
+            if (response.data?.url) {
+                window.location.href = response.data.url;
+            } else {
+                alert('Failed to create checkout session');
+            }
+        } catch (error) {
+            console.error('Checkout error:', error);
+            // User might not be logged in
+            base44.auth.redirectToLogin(window.location.href);
+        } finally {
+            setLoading(null);
+        }
+    };
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {tiers.map((tier) => (
@@ -91,13 +130,19 @@ export function PricingTiers() {
 
                         <Button
                             variant={tier.ctaVariant}
+                            onClick={() => handlePurchase(tier.name)}
+                            disabled={loading === tier.name.toLowerCase()}
                             className={`w-full ${
                                 tier.ctaVariant === 'default'
                                     ? 'bg-[#A03814] hover:bg-[#8a2f11] text-white border-0'
                                     : 'border-[rgba(26,26,26,0.2)] text-[#1a1a1a] hover:bg-[rgba(26,26,26,0.05)]'
                             }`}
                         >
-                            {tier.cta}
+                            {loading === tier.name.toLowerCase() ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                tier.cta
+                            )}
                         </Button>
                     </CardContent>
                 </Card>
