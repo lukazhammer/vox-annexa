@@ -1,7 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
-import { GoogleGenerativeAI } from 'npm:@google/generative-ai';
-
-const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'));
 
 Deno.serve(async (req) => {
   try {
@@ -42,58 +39,58 @@ Rules:
 4. Implementation prompt must work in Bolt, Cursor, or Lovable
 5. Success metric must be specific and measurable (numbers, not vague)
 6. Duration should be realistic (typically 7-14 days)
-7. Next moves should be specific actions based on each possible outcome
+7. Next moves should be specific actions based on each possible outcome`;
 
-Respond in JSON format matching this schema exactly:
-{
-  "diagnosis": {
-    "primaryIssue": "string - the core problem you've identified",
-    "confidence": "high" | "medium" | "low",
-    "reasoning": "string - why you believe this is the issue"
-  },
-  "experiment": {
-    "title": "string - short name for the experiment",
-    "hypothesis": "string - falsifiable hypothesis statement",
-    "variant": {
-      "type": "headline" | "cta" | "email" | "onboarding_step" | "feature_highlight",
-      "content": "string - copy-paste ready text",
-      "context": "string - where to use it"
-    },
-    "implementationPrompt": "string - ready for Bolt/Cursor/Lovable",
-    "successMetric": "string - specific and measurable",
-    "measurementPlan": "string - how to measure",
-    "durationDays": number
-  },
-  "nextMoves": {
-    "ifImproved": "string - specific action if metric improves",
-    "ifNoChange": "string - specific action if no change",
-    "ifWorsened": "string - specific action if metric worsens"
-  }
-}
+    const responseSchema = {
+      type: "object",
+      properties: {
+        diagnosis: {
+          type: "object",
+          properties: {
+            primaryIssue: { type: "string" },
+            confidence: { type: "string", enum: ["high", "medium", "low"] },
+            reasoning: { type: "string" }
+          },
+          required: ["primaryIssue", "confidence", "reasoning"]
+        },
+        experiment: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            hypothesis: { type: "string" },
+            variant: {
+              type: "object",
+              properties: {
+                type: { type: "string", enum: ["headline", "cta", "email", "onboarding_step", "feature_highlight"] },
+                content: { type: "string" },
+                context: { type: "string" }
+              },
+              required: ["type", "content", "context"]
+            },
+            implementationPrompt: { type: "string" },
+            successMetric: { type: "string" },
+            measurementPlan: { type: "string" },
+            durationDays: { type: "number" }
+          },
+          required: ["title", "hypothesis", "variant", "implementationPrompt", "successMetric", "measurementPlan", "durationDays"]
+        },
+        nextMoves: {
+          type: "object",
+          properties: {
+            ifImproved: { type: "string" },
+            ifNoChange: { type: "string" },
+            ifWorsened: { type: "string" }
+          },
+          required: ["ifImproved", "ifNoChange", "ifWorsened"]
+        }
+      },
+      required: ["diagnosis", "experiment", "nextMoves"]
+    };
 
-Output ONLY valid JSON, no markdown, no code blocks, just JSON.`;
-
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2000,
-      }
+    const sprintData = await base44.integrations.Core.InvokeLLM({
+      prompt,
+      response_json_schema: responseSchema
     });
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    // Parse JSON response
-    let sprintData;
-    try {
-      const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      sprintData = JSON.parse(cleanText);
-    } catch (parseError) {
-      console.error('Parse error:', parseError, 'Raw text:', text);
-      throw new Error('Failed to parse AI response');
-    }
 
     // Generate experiment ID
     const experimentId = `exp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
